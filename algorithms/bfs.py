@@ -1,5 +1,5 @@
 from collections import deque
-from grid_elements.node import Node # Import the Node class you just made
+from graphical_interface.spot import Spot # Import the Node class you just made
 
 def reconstruct_path(finish_node):
     """

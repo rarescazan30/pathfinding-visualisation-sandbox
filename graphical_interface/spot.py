@@ -1,5 +1,5 @@
 import pygame
-from constants import * 
+from .constants import * 
 
 class Spot:
     def __init__(self, row, col, width, total_rows):
