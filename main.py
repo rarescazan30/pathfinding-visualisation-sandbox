@@ -66,23 +66,32 @@ def main(win, width):
                 spot = grid[row][col]
 
                 # Left Mouse Button
-                if event.button == 1: 
-                    if not start_node and spot != end_node:
-                        start_node = spot
-                        start_node.mark_start()
-                    elif not end_node and spot != start_node:
-                        end_node = spot
-                        end_node.mark_end()
-                    elif spot != end_node and spot != start_node:
-                        spot.mark_barrier()
+            
+                if not start_node and spot != end_node:
+                    start_node = spot
+                    start_node.mark_start()
+                elif not end_node and spot != start_node:
+                    end_node = spot
+                    end_node.mark_end()
                 
-                # Right Mouse Button
-                elif event.button == 3:
-                    spot.reset()
-                    if spot == start_node:
-                        start_node = None
-                    if spot == end_node:
-                        end_node = None
+            if pygame.mouse.get_pressed()[0]:
+                pos = pygame.mouse.get_pos()
+                row, col = get_clicked_pos(pos, ROWS, width)
+                spot = grid[row][col]
+                if spot != end_node and spot != start_node:
+                    spot.mark_barrier()
+            elif pygame.mouse.get_pressed()[2]:
+                pos = pygame.mouse.get_pos()
+                row, col = get_clicked_pos(pos, ROWS, width)
+                spot = grid[row][col]
+                
+            # Reset spot (erasing barriers/paths)
+                spot.reset() 
+                if spot == start_node:
+                    start_node = None
+                if spot == end_node:
+                    end_node = None
+
 
             # --- KEYBOARD PRESSES ---
             if event.type == pygame.KEYDOWN:
