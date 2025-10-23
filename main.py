@@ -1,3 +1,5 @@
+# main.py
+
 from grid_elements.node import Node
 from algorithms.bfs import bfs
 
@@ -14,6 +16,33 @@ def make_grid():
             node = Node(i, j)
             grid[i].append(node)
     return grid
+
+# --- NEW FUNCTION TO DISPLAY THE GRID ---
+def print_grid_to_console(grid, path):
+    """
+    Prints a text representation of the grid to the console.
+    'S' = Start, 'F' = Finish, '1' = Wall, '*' = Path, '.' = Empty
+    """
+    # For fast lookups, convert the path list to a set of coordinates
+    path_coords = {(node.row, node.col) for node in path}
+
+    print("\n--- Grid Representation ---")
+    for row in grid:
+        row_str = ""
+        for node in row:
+            if node.is_start:
+                row_str += "S "
+            elif node.is_finish:
+                row_str += "F "
+            elif (node.row, node.col) in path_coords:
+                row_str += "* " # Path is represented by *
+            elif node.is_wall:
+                row_str += "1 " # Walls are represented by 1
+            else:
+                row_str += ". " # Empty space
+        print(row_str)
+    print("-------------------------")
+
 
 # This block runs only when you execute main.py directly
 if __name__ == "__main__":
@@ -45,6 +74,9 @@ if __name__ == "__main__":
     # 4. Print the result
     if path:
         print(f"\nPath found! Length: {len(path)} nodes.")
-        # print("Path:", path) # Uncomment to see all nodes in the path
+        
+        # --- CALL THE NEW PRINT FUNCTION ---
+        print_grid_to_console(grid, path)
+
     else:
         print("\nNo path could be found.")
