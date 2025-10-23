@@ -1,32 +1,49 @@
 import pygame
 import math
 from queue import PriorityQueue
-
-WIDTH = 800
-WIN = pygame.display.set_mode((WIDTH, WIDTH))
-pygame.display.set_caption("Pathfinding Visualisation Sandbox")
-
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 255, 0)
-YELLOW = (255, 255, 0)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-PURPLE = (128, 0, 128)
-ORANGE = (255, 165 ,0)
-GREY = (128, 128, 128)
-TURQUOISE = (64, 224, 208)
+from constants import * 
 
 pygame.init()
 
+WIN = pygame.display.set_mode((WIDTH, WIDTH))
+pygame.display.set_caption("Pathfinding Visualisation Sandbox")
+
+
+
+
 run = True
+fill_colour = RED
+
+try:
+    FONT = pygame.font.Font('BitcountGridSingle-VariableFont_CRSV,ELSH,ELXP,slnt,wght.ttf', 40)
+except pygame.error:
+    # in case font not installed/found
+    print("Error loading custom font. Falling back to monospace.")
+    FONT = pygame.font.SysFont('monospace', 30)
+
+current_message = "Press a key to start"
+
 
 while run:
-    # check for quit
+    WIN.fill(fill_colour)
+    #check for quit
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            run = False
-    WIN.fill(WHITE)
+          run = False
+        if event.type == pygame.KEYDOWN:
+            fill_colour = TURQUOISE
+            current_message = "You pressed a key!"
+            pygame.display.set_caption(current_message)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            current_message = "You pressed mouse button!"
+            fill_colour = ORANGE   
+            pygame.display.set_caption(current_message)
+    text_surface = FONT.render(current_message, True, BLACK) # render text surface
+    text_rect = text_surface.get_rect(center=(WIDTH // 2, 50)) # made square where text will be
+    WIN.blit(text_surface, text_rect) # draw text onto surface   
+    
+           
+    
     pygame.display.update()
     
 
