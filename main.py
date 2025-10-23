@@ -30,6 +30,8 @@ def make_grid(rows, width):
         grid.append([])
         for j in range(rows):
             spot = Spot(i, j, gap, rows)
+            if i == 0 or i == rows - 1 or j == 0 or j == rows - 1:
+                spot.mark_barrier()
             grid[i].append(spot)
     return grid
 
@@ -58,45 +60,41 @@ def main(win, width):
                 run = False
 
             # --- MOUSE CLICKS ---
-            if pygame.mouse.get_pressed()[0]: # LEFT MOUSE BUTTON
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
                 spot = grid[row][col]
 
-                if not start_node and spot != end_node:
-                    start_node = spot
-                    start_node.mark_start()
-
-                elif not end_node and spot != start_node:
-                    end_node = spot
-                    end_node.mark_end()
-
-                elif spot != end_node and spot != start_node:
-                    spot.mark_barrier()
-
-            elif pygame.mouse.get_pressed()[2]: # RIGHT MOUSE BUTTON
-                pos = pygame.mouse.get_pos()
-                row, col = get_clicked_pos(pos, ROWS, width)
-                spot = grid[row][col]
-                spot.reset()
-                if spot == start_node:
-                    start_node = None
-                if spot == end_node:
-                    end_node = None
+                # Left Mouse Button
+                if event.button == 1: 
+                    if not start_node and spot != end_node:
+                        start_node = spot
+                        start_node.mark_start()
+                    elif not end_node and spot != start_node:
+                        end_node = spot
+                        end_node.mark_end()
+                    elif spot != end_node and spot != start_node:
+                        spot.mark_barrier()
+                
+                # Right Mouse Button
+                elif event.button == 3:
+                    spot.reset()
+                    if spot == start_node:
+                        start_node = None
+                    if spot == end_node:
+                        end_node = None
 
             # --- KEYBOARD PRESSES ---
             if event.type == pygame.KEYDOWN:
                 # Run algorithm when SPACE is pressed
                 if event.key == pygame.K_SPACE and start_node and end_node:
-                    path = bfs(grid, start_node, end_node)
-                    if path:
-                        # Draw the final path
-                        for node in path:
-                            if node != start_node and node != end_node:
-                                node.mark_path()
-                        # Redraw start and end to be on top
-                        start_node.mark_start()
-                        end_node.mark_end()
+                    # --- THIS IS THE NEW LOGIC ---
+                    # The lambda function allows us to pass the draw function without calling it yet
+                    algorithm_generator = bfs(lambda: draw(win, grid, ROWS, width), grid, start_node, end_node)
+                    # Run the generator to completion
+                    for _ in algorithm_generator:
+                        pass
+                    # --- END OF NEW LOGIC ---
 
 
                 # Clear the board when 'C' is pressed

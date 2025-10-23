@@ -8,7 +8,7 @@ class Spot:
         self.width = width
         self.x = row * width
         self.y = col * width
-        self.colour = TURQUOISE # colour of the spot
+        self.colour = WHITE # colour of the spot
         self.neighbors = [] # list of neighboring spots
         self.total_rows = total_rows
 

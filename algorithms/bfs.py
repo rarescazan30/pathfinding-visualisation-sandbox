@@ -1,43 +1,55 @@
+# algorithms/bfs.py
+
 from collections import deque
-from graphical_interface.spot import Spot # Import the Node class you just made
+from graphical_interface.spot import Spot
 
-def reconstruct_path(finish_node):
+def reconstruct_path(came_from, current, draw):
     """
-    Backtracks from the finish node to the start node using parent pointers.
+    Backtracks from the end node and draws the final path.
     """
-    path = []
-    current = finish_node
-    while current is not None:
-        path.append(current)
-        current = current.parent
-    return path[::-1] # Reverse the path to get it from start to finish
+    while current in came_from:
+        current = came_from[current]
+        current.mark_path()
+        draw()
 
-def bfs(grid, start_node, finish_node):
+def bfs(draw, grid, start_node, finish_node):
     """
-    Performs the Breadth-First Search algorithm to find the shortest path.
+    Performs BFS. This is a generator that yields at each step.
     """
-    rows, cols = len(grid), len(grid[0])
     queue = deque([start_node])
-    start_node.is_visited = True
+    came_from = {} # To reconstruct the path
+    visited = {start_node} # A set for fast lookups
 
     while queue:
         current_node = queue.popleft()
 
         if current_node == finish_node:
-            # We found the path, now reconstruct it
-            return reconstruct_path(finish_node)
+            reconstruct_path(came_from, finish_node, draw)
+            # Redraw start and end to ensure they are on top
+            finish_node.mark_end()
+            start_node.mark_start()
+            return True # Path found
 
-        # Explore neighbors (Up, Down, Left, Right)
+        # Explore neighbors
         for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
             r, c = current_node.row + dr, current_node.col + dc
-
-            # Check if neighbor is valid
-            if 0 <= r < rows and 0 <= c < cols:
+            
+            # This check is technically not needed due to the border, but it's good practice
+            if 0 <= r < len(grid) and 0 <= c < len(grid[0]):
                 neighbor = grid[r][c]
-                if not neighbor.is_visited and not neighbor.is_wall:
-                    neighbor.is_visited = True
-                    neighbor.parent = current_node
+                if neighbor not in visited and not neighbor.is_barrier():
+                    visited.add(neighbor)
+                    came_from[neighbor] = current_node
                     queue.append(neighbor)
-    
-    # If the queue becomes empty and we haven't found the finish, there is no path
-    return None
+                    # Mark this node as being "considered" (part of the open set)
+                    neighbor.mark_open()
+
+        draw() # Redraw the grid to show the new open/closed nodes
+
+        # Mark the current node as "visited" (part of the closed set)
+        if current_node != start_node:
+            current_node.mark_closed()
+        
+        yield True # Yield control back to the main loop
+
+    return False # Path not found
