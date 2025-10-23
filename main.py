@@ -13,12 +13,12 @@ def draw(win, grid, rows, width):
         for spot in row:
             spot.draw(win) # Call the draw method for each spot
 
-    # Draw grid lines
-    gap = width // rows
-    for i in range(rows):
-        pygame.draw.line(win, GREY, (0, i * gap), (width, i * gap))
-        for j in range(rows):
-            pygame.draw.line(win, GREY, (j * gap, 0), (j * gap, width))
+    #Draw grid lines
+    # gap = width // rows
+    # for i in range(rows):
+    #     pygame.draw.line(win, GREY, (0, i * gap), (width, i * gap))
+    #     for j in range(rows):
+    #         pygame.draw.line(win, GREY, (j * gap, 0), (j * gap, width))
 
     pygame.display.update()
 
@@ -41,11 +41,15 @@ def get_clicked_pos(pos, rows, width):
     y, x = pos
     row = y // gap
     col = x // gap
+    if row >= rows:
+        row = rows - 1
+    if col >= rows:
+        col = rows - 1
     return row, col
 
 # --- The Main Application Logic ---
 def main(win, width):
-    ROWS = 30
+    ROWS = 40
     grid = make_grid(ROWS, width)
 
     start_node = None
