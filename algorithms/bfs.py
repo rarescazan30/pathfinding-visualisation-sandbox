@@ -12,7 +12,7 @@ def reconstruct_path(came_from, current, draw):
         current.mark_path()
         draw()
 
-def bfs(draw, grid, start_node, finish_node):
+def bfs(draw, grid, start_node, finish_node, visited_colour):
     """
     Performs BFS. This is a generator that yields at each step.
     """
@@ -48,7 +48,7 @@ def bfs(draw, grid, start_node, finish_node):
 
         # Mark the current node as "visited" (part of the closed set)
         if current_node != start_node:
-            current_node.mark_closed()
+            current_node.mark_closed(visited_colour)
         
         yield True # Yield control back to the main loop
 

@@ -34,14 +34,16 @@ class Spot:
     def is_end(self):
         return self.colour == TURQUOISE
 
+    
+
     def mark_start(self):
         self.colour = ORANGE
         self.is_wall = False
         self.is_visited = False
         self.is_start = True
         self.is_end = False
-    def mark_closed(self):
-        self.colour = RED
+    def mark_closed(self, colour):
+        self.colour = colour
         self.is_wall = False
         self.is_visited = True
     def mark_open(self):
