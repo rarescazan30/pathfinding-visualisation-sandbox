@@ -18,7 +18,7 @@ def draw(win, grid, rows, width):
     #     for j in range(rows):
     #         pygame.draw.line(win, GREY, (j * gap, 0), (j * gap, width))
 
-    pygame.display.update()
+    pygame.display.flip()
 
 
 def make_grid(rows, width):

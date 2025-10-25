@@ -6,6 +6,7 @@ from algorithms.bfs import bfs
 from grid import draw, make_grid, get_clicked_pos
 
 
+# auxiliary function to change colours each run of the algorithm
 def add_colors(color1, color2):
     result = []
     for c1, c2 in zip(color1, color2):
@@ -23,7 +24,7 @@ def add_colors(color1, color2):
                 new_colour = 255
         # we do not want new colour same as game colours or old colours
         while new_colour in {RED, GREEN, BLUE, YELLOW, WHITE, BLACK, PURPLE, ORANGE, GREY, TURQUOISE, c1 + c2, c1 - c2}:
-            new_colour = new_colour + random.randint(-10,10)
+            new_colour = new_colour + random.randint(-20,20)
             if new_colour < 0:
                 new_colour = 0
             elif new_colour > 255:
