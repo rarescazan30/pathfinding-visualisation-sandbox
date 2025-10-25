@@ -1,10 +1,13 @@
 import pygame
 import random
+import shared
 from graphical_interface.constants import *
 from graphical_interface.spot import Spot
 from algorithms.bfs import bfs
 from events import handle_events
 from grid import draw, make_grid, get_clicked_pos
+
+shared.cur_square_color = RED 
 
 def main(win, width):
     ROWS = 40
@@ -18,7 +21,7 @@ def main(win, width):
     run = True
     while run:
         draw(win, grid, ROWS, width)
-        run, start_node, end_node, currrent_square_colour = handle_events(grid, ROWS, start_node, end_node, win, width, currrent_square_colour)
+        run, start_node, end_node, shared.cur_square_color = handle_events(grid, ROWS, start_node, end_node, win, width, shared.cur_square_color)
     pygame.quit()
 
 if __name__ == "__main__":

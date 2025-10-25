@@ -6,7 +6,8 @@ from algorithms.bfs import bfs
 
 def draw(win, grid, rows, width):
     win.fill(WHITE) # Fill the whole screen with a white background
-
+    
+    # draw each spot on grid
     for row in grid:
         for spot in row:
             spot.draw(win) # Call the draw method for each spot
@@ -29,7 +30,7 @@ def make_grid(rows, width):
         for j in range(rows):
             spot = Spot(i, j, gap, rows)
             if i == 0 or i == rows - 1 or j == 0 or j == rows - 1:
-                spot.mark_barrier()
+                spot.mark_outer_barrier()
             grid[i].append(spot)
     return grid
 

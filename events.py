@@ -6,6 +6,7 @@ from algorithms.bfs import bfs
 from grid import draw, make_grid, get_clicked_pos
 
 
+
 # auxiliary function to change colours each run of the algorithm
 def add_colors(color1, color2):
     result = []
