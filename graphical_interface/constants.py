@@ -1,8 +1,16 @@
-WIDTH = 800
-SIDE_MENU_WIDTH = 300  # Extra width for the menu on the right
-TOTAL_WIDTH = WIDTH + SIDE_MENU_WIDTH # Total window width
+TOTAL_WIDTH = 1280
+TOTAL_HEIGHT = 720
 
-TOTAL_HEIGHT = 800
+# Grid dimensions (making it a square)
+GRID_WIDTH = TOTAL_HEIGHT  # Feel free to adjust this
+GRID_HEIGHT = TOTAL_HEIGHT
+
+# Calculate offsets to center the grid
+GRID_X_OFFSET = (TOTAL_WIDTH - GRID_WIDTH) // 2
+GRID_Y_OFFSET = (TOTAL_HEIGHT - GRID_HEIGHT) // 2
+
+# Menu dimensions
+SIDE_MENU_WIDTH = GRID_X_OFFSET
 
 # Calm, Muted Red/Closed Spot (e.g., Dusty Rose)
 RED = (255, 212, 133)
