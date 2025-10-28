@@ -1,5 +1,3 @@
-# graphical_interface/spot.py
-
 import pygame
 from .constants import *
 
@@ -13,11 +11,9 @@ class Spot:
         self.colour = WHITE
         self.neighbors = []
         self.total_rows = total_rows
-
         self.is_start = False
         self.is_end = False
         self.is_wall = False
-        
         self.is_visited = False
         self.parent = None
 
@@ -48,7 +44,8 @@ class Spot:
     def mark_start(self):
         self.colour = ORANGE
         self.is_start = True
-        self.is_wall = False # This line is critical
+        # CRITICAL FIX: Ensure a start node can never be a wall.
+        self.is_wall = False
 
     def mark_closed(self, colour):
         self.colour = colour
@@ -64,7 +61,8 @@ class Spot:
     def mark_end(self):
         self.colour = TURQUOISE
         self.is_end = True
-        self.is_wall = False # This line is critical
+        # CRITICAL FIX: Ensure an end node can never be a wall.
+        self.is_wall = False
 
     def mark_path(self):
         self.colour = PURPLE
@@ -78,5 +76,7 @@ class Spot:
         self.is_end = False
         self.is_start = False
 
-    def draw(self, win):
-        pygame.draw.rect(win, self.colour, (self.x + GRID_X_OFFSET, self.y + GRID_Y_OFFSET, self.width, self.width))
+    def draw(self, win, padding_x, padding_y):
+        final_x = self.x + GRID_X_OFFSET + padding_x
+        final_y = self.y + GRID_Y_OFFSET + padding_y
+        pygame.draw.rect(win, self.colour, (final_x, final_y, self.width, self.width))
