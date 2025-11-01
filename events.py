@@ -5,6 +5,7 @@ import random
 from graphical_interface.constants import *
 from graphical_interface.spot import Spot
 from algorithms.bfs import bfs
+from algorithms.dfs import dfs
 from grid import draw, make_grid, get_clicked_pos
 
 def add_colors(color1, color2):
@@ -128,10 +129,11 @@ def handle_events(grid, ROWS, start_node, end_node, win, width, cur_square_color
                 for row in grid:
                     for spot in row:
                         spot.clear_visualization()
-                algorithm_generator = bfs(
+                algorithm_generator = dfs(
                    lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible),
                    grid, start_node, end_node, cur_square_color
                 )
+
                 for _ in algorithm_generator: pass
                 cur_square_color = add_colors(cur_square_color, (10, 10, 10))
 
