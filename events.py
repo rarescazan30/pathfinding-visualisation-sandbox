@@ -229,7 +229,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
 
                 elif drawing_mode == "eraser":
                     is_border_wall = row == 0 or row == ROWS - 1 or col == 0 or col == ROWS - 1
-                    if spot.is_wall and not is_border_wall:
+                    if spot.is_wall == True and not is_border_wall:
                         spot.reset()
                 
                 # !!! CHANGE I MADE: removed just_loaded mode handling from here and added it above, view line 193. PLEASE CHECK FUNCTIONALITY HERE ON LINUX!
