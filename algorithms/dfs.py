@@ -13,7 +13,7 @@ def reconstruct_path(came_from, current, draw):
 
 def dfs(draw, grid, start_node, finish_node, visited_colour):
     stack = [start_node] # we use stack like this instead of recursion
-    came_from: Dict['Spot', 'Spot'] = {} # for path reconstruction 
+    came_from = {} # for path reconstruction 
     visited = {start_node} # to avoid infinite loops
 
     while stack:

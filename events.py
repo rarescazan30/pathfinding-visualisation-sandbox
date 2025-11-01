@@ -6,6 +6,7 @@ from graphical_interface.constants import *
 from graphical_interface.spot import Spot
 from algorithms.bfs import bfs
 from algorithms.dfs import dfs
+from algorithms.best_first_search import greedyBestFirstSearch
 from grid import draw, make_grid, get_clicked_pos
 
 def add_colors(color1, color2):
@@ -129,7 +130,7 @@ def handle_events(grid, ROWS, start_node, end_node, win, width, cur_square_color
                 for row in grid:
                     for spot in row:
                         spot.clear_visualization()
-                algorithm_generator = dfs(
+                algorithm_generator = greedyBestFirstSearch(
                    lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible),
                    grid, start_node, end_node, cur_square_color
                 )
