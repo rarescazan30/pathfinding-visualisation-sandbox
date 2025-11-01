@@ -106,7 +106,7 @@ def handle_events(grid, ROWS, start_node, end_node, win, width, cur_square_color
                             spot.mark_barrier()
                 elif drawing_mode == "eraser":
                     is_border_wall = row == 0 or row == ROWS - 1 or col == 0 or col == ROWS - 1
-                    if spot.is_barrier and not is_border_wall:
+                    if spot.is_wall == True and not is_border_wall:
                         spot.reset()
 
         # Right-Click Logic
