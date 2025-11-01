@@ -69,6 +69,9 @@ class Spot:
         self.is_visited = True
         
     def reset(self):
+        # if (self.is_visited):
+        #     self.colour = RED
+        # else:
         self.colour = WHITE
         self.is_visited = False
         self.parent = None
