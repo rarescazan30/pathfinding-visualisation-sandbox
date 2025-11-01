@@ -31,9 +31,14 @@ def dfs(draw, grid, start_node, finish_node, visited_colour):
         for dr, dc in [(0, 1), (0, -1), (-1, 0), (1, 0)]:
             r, c = current_node.row + dr, current_node.col + dc # grid coordinates for the neighbor
             
-            if 0 < r < len(grid) - 1 and 0 < c < len(grid[0]) - 1:
+            # --- BUG FIX ---
+            # The old check (0 < r < len(grid) - 1) was too restrictive
+            # and didn't match the other algorithms.
+            # This new check is consistent and correct.
+            if 0 <= r < len(grid) and 0 <= c < len(grid[0]):
+            # --- END FIX ---
                 neighbor = grid[r][c]
-                if neighbor not in visited and not neighbor.is_barrier():
+                if neighbor not in visited and not neighbor.is_wall: # Use .is_wall
                     visited.add(neighbor)
                     came_from[neighbor] = current_node
                     stack.append(neighbor) # push to the stack

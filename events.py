@@ -7,9 +7,11 @@ import re
 # Removed easygui, it's not called from here
 from graphical_interface.constants import *
 from graphical_interface.spot import Spot
+# --- Import all algorithms ---
 from algorithms.bfs import bfs
 from algorithms.dfs import dfs
 from algorithms.best_first_search import greedyBestFirstSearch
+# ---
 from grid import draw, make_grid, get_clicked_pos
 
 # --- REMOVED: get_matrix_input_popup() ---
@@ -51,32 +53,63 @@ def add_colors(color1, color2):
         result.append(new_colour)
     return tuple(result)
 
-def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message):
+# --- Updated function signature ---
+def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm):
+    
+    # --- Unpack all buttons, including new ones ---
     (find_path_button, toggle_grid_button, toggle_mode_button, 
      decrease_button, increase_button, 
-     load_matrix_button, save_matrix_button) = buttons
+     load_matrix_button, save_matrix_button,
+     bfs_button, dfs_button, gbfs_button) = buttons
     
-    if len(events) > 0:
-        error_message = None
+    # --- FIX #1: Update algorithm button colors ---
+    # We set their base color *before* checking for hovers.
+    # Reset all to inactive color
+    bfs_button.base_color = ORANGE
+    dfs_button.base_color = ORANGE
+    gbfs_button.base_color = ORANGE
+    
+    # Set the active one to a different color (e.g., GREEN)
+    if current_algorithm == "bfs":
+        bfs_button.base_color = GREEN
+    elif current_algorithm == "dfs":
+        dfs_button.base_color = GREEN
+    elif current_algorithm == "gbfs":
+        gbfs_button.base_color = GREEN
+    # --- End of Fix #1 ---
     
     mouse_pos = pygame.mouse.get_pos()
     for button in buttons:
         button.check_for_hover(mouse_pos)
 
     for event in events:
-        if event.type == pygame.QUIT:
-            return False, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message
+        # --- FIX #2: Clear error message only on a new action ---
+        # This stops mouse movement from clearing the error.
+        if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
+            error_message = None
+        # --- End of Fix #2 ---
 
-        # --- Button Click Logic (unchanged) ---
+        if event.type == pygame.QUIT:
+            # --- Add new state to return tuple ---
+            return False, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm
+
+        # --- Button Click Logic ---
         if find_path_button.is_clicked(event):
             if start_node and end_node:
                 for row in grid:
                     for spot in row:
                         spot.clear_visualization()
-                algorithm_generator = bfs(
-                    lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message),
-                    grid, start_node, end_node, cur_square_color
-                )
+                
+                # --- NEW: Use current_algorithm to decide ---
+                draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message)
+                
+                if current_algorithm == "bfs":
+                    algorithm_generator = bfs(draw_lambda, grid, start_node, end_node, cur_square_color)
+                elif current_algorithm == "dfs":
+                    algorithm_generator = dfs(draw_lambda, grid, start_node, end_node, cur_square_color)
+                elif current_algorithm == "gbfs":
+                    algorithm_generator = greedyBestFirstSearch(draw_lambda, grid, start_node, end_node, cur_square_color)
+
                 for _ in algorithm_generator: pass
                 cur_square_color = add_colors(cur_square_color, (10, 10, 10))
                 pygame.event.clear(pygame.KEYDOWN) 
@@ -98,13 +131,23 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
             pyperclip.copy(matrix_str)
             print("Matrix copied to clipboard!") 
 
-        # --- THIS IS THE FIX ---
-        # Set the flag to trigger the popup in main.py
         if load_matrix_button.is_clicked(event):
             drawing_mode = "get_matrix"
-            # We break here to allow main.py to handle it
             break 
-        # --- END OF FIX ---
+        
+        # --- NEW: Handle Algorithm Button Clicks ---
+        if bfs_button.is_clicked(event):
+            current_algorithm = "bfs"
+            print("Algorithm set to BFS") # For debugging
+        
+        if dfs_button.is_clicked(event):
+            current_algorithm = "dfs"
+            print("Algorithm set to DFS")
+            
+        if gbfs_button.is_clicked(event):
+            current_algorithm = "gbfs"
+            print("Algorithm set to Greedy Best-First")
+        # ---
         
         # --- Grid Size Buttons (unchanged) ---
         grid_changed = False
@@ -124,15 +167,13 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
             grid = make_grid(ROWS, width)
             continue
 
-        # --- MOUSE CLICK LOGIC (UPDATED) ---
+        # --- MOUSE CLICK LOGIC (unchanged) ---
         if pygame.mouse.get_pressed()[0] or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
             pos = pygame.mouse.get_pos()
             row, col = get_clicked_pos(pos, ROWS, width)
             if row is not None:
                 spot = grid[row][col]
                 
-                # --- THIS IS FIX #2 ---
-                # Handle the "maker" state
                 if drawing_mode == "maker":
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if not start_node and not spot.is_end:
@@ -143,26 +184,18 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
                             end_node.mark_end()
                         elif not spot.is_start and not spot.is_end:
                             spot.mark_barrier()
-                    
-                    # Explicitly block drag-drawing if mode is "just_loaded"
                     elif pygame.mouse.get_pressed()[0]: 
                         if not spot.is_start and not spot.is_end:
                             spot.mark_barrier()
 
-                # Handle the "eraser" state
                 elif drawing_mode == "eraser":
                     is_border_wall = row == 0 or row == ROWS - 1 or col == 0 or col == ROWS - 1
                     if spot.is_wall and not is_border_wall:
                         spot.reset()
                 
-                # Handle the "just_loaded" state
                 elif drawing_mode == "just_loaded":
-                    # We ONLY respond to a fresh click
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        # Set mode back to normal
                         drawing_mode = "maker" 
-                        
-                        #... and process the click immediately
                         if not start_node and not spot.is_end:
                             start_node = spot
                             start_node.mark_start()
@@ -171,7 +204,6 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
                             end_node.mark_end()
                         elif not spot.is_start and not spot.is_end:
                             spot.mark_barrier()
-                # --- END OF FIX ---
 
         # Right-Click Logic (unchanged)
         if pygame.mouse.get_pressed()[2]:
@@ -186,17 +218,22 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
                     end_node = None
                     spot.reset()
         
-        # --- KEYBOARD LOGIC (unchanged) ---
+        # --- KEYBOARD LOGIC ---
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and start_node and end_node:
                 for row in grid:
                     for spot in row:
                         spot.clear_visualization()
                 
-                algorithm_generator = bfs(
-                   lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message),
-                   grid, start_node, end_node, cur_square_color
-                )
+                # --- NEW: Use current_algorithm to decide ---
+                draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message)
+
+                if current_algorithm == "bfs":
+                    algorithm_generator = bfs(draw_lambda, grid, start_node, end_node, cur_square_color)
+                elif current_algorithm == "dfs":
+                    algorithm_generator = dfs(draw_lambda, grid, start_node, end_node, cur_square_color)
+                elif current_algorithm == "gbfs":
+                    algorithm_generator = greedyBestFirstSearch(draw_lambda, grid, start_node, end_node, cur_square_color)
 
                 for _ in algorithm_generator: pass
                 cur_square_color = add_colors(cur_square_color, (10, 10, 10))
@@ -207,5 +244,7 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
                 end_node = None
                 grid = make_grid(ROWS, width)
 
-    return True, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message
+    # --- Add new state to return tuple ---
+    return True, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm
+
 
