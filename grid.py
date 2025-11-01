@@ -4,7 +4,7 @@ from graphical_interface.spot import Spot
 from graphical_interface.constants import *
 from algorithms.bfs import bfs
 
-def draw(win, grid, rows, width, buttons, grid_lines_visible):
+def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message):
     win.fill(WHITE)
 
     # Draw side menus
@@ -26,7 +26,9 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible):
     font = pygame.font.SysFont("Arial", 22)
     usable_size = rows - 2
     size_text = font.render(f"{usable_size}x{usable_size} Grid", True, BLACK)
-    text_rect = size_text.get_rect(center=(buttons[-1].rect.centerx - 75, 350))
+    button_x_right_menu = GRID_X_OFFSET + GRID_WIDTH + 50
+    text_center_x = button_x_right_menu + 100 # Center between the +/- buttons
+    text_rect = size_text.get_rect(center=(text_center_x, 350))
     win.blit(size_text, text_rect)
 
     # Draw all the spots on top of the new black background
@@ -43,6 +45,13 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible):
     # Draw the UI buttons
     for button in buttons:
         button.draw(win)
+
+    # --- NEW: Draw Error Message ---
+    if error_message:
+        error_font = pygame.font.SysFont("Arial", 18, bold=True)
+        error_surface = error_font.render(error_message, True, (200, 0, 0))
+        error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, 480))
+        win.blit(error_surface, error_rect)
 
     pygame.display.update()
 

@@ -34,14 +34,15 @@ def bfs(draw, grid, start_node, finish_node, visited_colour):
         for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
             r, c = current_node.row + dr, current_node.col + dc
             
-            # This check is technically not needed due to the border, but it's good practice
             if 0 <= r < len(grid) and 0 <= c < len(grid[0]):
                 neighbor = grid[r][c]
-                if neighbor not in visited and not neighbor.is_barrier():
+                
+                # !!! --- THIS IS PART OF FIX #2: THE DRAWING CRASH --- !!!
+                # Use .is_wall (boolean) instead of .is_barrier() (method)
+                if neighbor not in visited and not neighbor.is_wall:
                     visited.add(neighbor)
                     came_from[neighbor] = current_node
                     queue.append(neighbor)
-                    # Mark this node as being "considered" (part of the open set)
                     neighbor.mark_open()
 
         draw() # Redraw the grid to show the new open/closed nodes
