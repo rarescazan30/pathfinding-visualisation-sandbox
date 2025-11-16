@@ -154,6 +154,7 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
         
         if decrease_button.is_clicked(event) or increase_button.is_clicked(event):
             first_pressed_time = pygame.time.get_ticks()
+            # we want to decrease/increase WHILE the button is pressed
             while pygame.mouse.get_pressed()[0]:
                 current_time = pygame.time.get_ticks()
                 time_held = current_time - first_pressed_time
