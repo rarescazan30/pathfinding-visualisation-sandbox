@@ -2,7 +2,7 @@
 import pygame
 from graphical_interface.spot import Spot
 from graphical_interface.constants import *
-from algorithms.bfs import bfs
+
 
 def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message):
     win.fill(WHITE)

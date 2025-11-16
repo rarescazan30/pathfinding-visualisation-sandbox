@@ -15,6 +15,10 @@ SIDE_MENU_WIDTH = GRID_X_OFFSET
 # Calm, Muted Red/Closed Spot (e.g., Dusty Rose)
 RED = (255, 212, 133)
 
+BUTTON_RED = (200, 80, 80)
+
+HOVER_BUTTON_RED = (180, 100, 100)
+
 # Calm, Muted Green/Open Spot (e.g., Sage Green)
 GREEN = (0, 108, 103)
 
