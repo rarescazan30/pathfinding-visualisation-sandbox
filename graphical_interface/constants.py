@@ -1,47 +1,38 @@
 TOTAL_WIDTH = 1280
 TOTAL_HEIGHT = 720
 
-# Grid dimensions (making it a square)
-GRID_WIDTH = TOTAL_HEIGHT  # Feel free to adjust this
+# grid dimensions (square)
+GRID_WIDTH = TOTAL_HEIGHT
 GRID_HEIGHT = TOTAL_HEIGHT
 
-# Calculate offsets to center the grid
+# calculate offsets to center the grid
 GRID_X_OFFSET = (TOTAL_WIDTH - GRID_WIDTH) // 2
 GRID_Y_OFFSET = (TOTAL_HEIGHT - GRID_HEIGHT) // 2
 
-# Menu dimensions
+# menu dimensions
 SIDE_MENU_WIDTH = GRID_X_OFFSET
 
-# Calm, Muted Red/Closed Spot (e.g., Dusty Rose)
-RED = (255, 212, 133)
 
-BUTTON_RED = (200, 80, 80)
+RED = (255, 212, 133)          # light peach / pale orange
 
-HOVER_BUTTON_RED = (180, 100, 100)
+BUTTON_RED = (200, 80, 80)     # muted red
 
-# Calm, Muted Green/Open Spot (e.g., Sage Green)
-GREEN = (0, 108, 103)
+HOVER_BUTTON_RED = (180, 100, 100)  # dusty red / desaturated rose
 
-# Calm, Muted Blue (e.g., Steel Blue/Slate)
-BLUE = (100, 140, 160)
+GREEN = (0, 108, 103)          # teal green
 
-# Calm, Muted Yellow (e.g., Cream/Pale Gold)
-YELLOW = (220, 210, 160)
+BLUE = (100, 140, 160)         # steel blue / desaturated cyan
 
-# Standard White
-WHITE = (255, 235, 198)
+YELLOW = (220, 210, 160)       # light khaki / pale gold
 
-# Standard Black/Barrier
-BLACK = (0, 56, 68)  # Slightly softer black
+WHITE = (255, 235, 198)        # cream / ivory
 
-# Calm, Muted Purple/Path (e.g., Lavender/Mauve)
-PURPLE = (0, 117, 143)
+BLACK = (0, 56, 68)            # dark teal / deep cyan
 
-# Calm, Muted Orange/Start Spot (e.g., Peach/Tangerine)
-ORANGE = (255, 177, 0)
+PURPLE = (0, 117, 143)         # deep cyan-blue / petrol blue
 
-# Standard Medium Grey/Grid Lines
-GREY = (170, 170, 170)
+ORANGE = (255, 177, 0)         # amber / vivid orange
 
-# Calm, Muted Turquoise/End Spot (e.g., Aqua Blue)
-TURQUOISE = (120, 190, 180)
+GREY = (170, 170, 170)         # medium grey
+
+TURQUOISE = (120, 190, 180)    # soft turquoise / light teal

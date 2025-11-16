@@ -70,10 +70,10 @@ class Button:
         ]
 
     def draw(self, win):
-        # Draw the button rectangle
+        # draw the button rectangle
         pygame.draw.rect(win, self.current_color, self.rect, border_radius=12)
         
-        # Render and center the text
+        # render and center the text
         text_surface = self.font.render(self.text, True, (255, 255, 255))
         text_rect = text_surface.get_rect(center=self.rect.center)
         win.blit(text_surface, text_rect)
@@ -90,6 +90,6 @@ class Button:
         return False
     
     def update_text(self, new_text):
-        """Updates the text displayed on the button."""
+        #updates the text displayed on the button
         self.text = new_text
         
