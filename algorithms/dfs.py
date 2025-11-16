@@ -1,4 +1,4 @@
-import time # in case we want to add delays for visualization
+import time
 from graphical_interface.spot import Spot
 
 def reconstruct_path(came_from, current, draw):
@@ -9,7 +9,7 @@ def reconstruct_path(came_from, current, draw):
         current = came_from[current]
         current.mark_path()
         draw()
-        #time.sleep(0.02)
+        time.sleep(0.02)
 
 def dfs(draw, grid, start_node, finish_node, visited_colour):
     stack = [start_node] # we use stack like this instead of recursion
@@ -30,15 +30,9 @@ def dfs(draw, grid, start_node, finish_node, visited_colour):
         # explore neighbors (this is because we are working on a grid)
         for dr, dc in [(0, 1), (0, -1), (-1, 0), (1, 0)]:
             r, c = current_node.row + dr, current_node.col + dc # grid coordinates for the neighbor
-            
-            # --- BUG FIX ---
-            # The old check (0 < r < len(grid) - 1) was too restrictive
-            # and didn't match the other algorithms.
-            # This new check is consistent and correct.
-            if 0 <= r < len(grid) and 0 <= c < len(grid[0]):
-            # --- END FIX ---
+            if 0 <= r < len(grid) and 0 <= c < len(grid[0]):    
                 neighbor = grid[r][c]
-                if neighbor not in visited and not neighbor.is_wall: # Use .is_wall
+                if neighbor not in visited and not neighbor.is_wall:
                     visited.add(neighbor)
                     came_from[neighbor] = current_node
                     stack.append(neighbor) # push to the stack
@@ -46,9 +40,7 @@ def dfs(draw, grid, start_node, finish_node, visited_colour):
                     # visual indication that this node is being considered
                     if neighbor != finish_node:
                         neighbor.mark_open()
-
+                        time.sleep(0.02) # small delay for visualization
         draw() 
-        
         yield True # yield control back to the main loop
-
     return False
