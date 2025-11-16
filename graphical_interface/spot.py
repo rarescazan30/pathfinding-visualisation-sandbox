@@ -44,7 +44,6 @@ class Spot:
     def mark_start(self):
         self.colour = ORANGE
         self.is_start = True
-        # CRITICAL FIX: Ensure a start node can never be a wall.
         self.is_wall = False
 
     def mark_closed(self, colour):
@@ -61,7 +60,6 @@ class Spot:
     def mark_end(self):
         self.colour = TURQUOISE
         self.is_end = True
-        # CRITICAL FIX: Ensure an end node can never be a wall.
         self.is_wall = False
 
     def mark_path(self):
@@ -69,9 +67,6 @@ class Spot:
         self.is_visited = True
         
     def reset(self):
-        # if (self.is_visited):
-        #     self.colour = RED
-        # else:
         self.colour = WHITE
         self.is_visited = False
         self.parent = None

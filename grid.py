@@ -7,46 +7,47 @@ from graphical_interface.constants import *
 def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message):
     win.fill(WHITE)
 
-    # Draw side menus
+    # draw side menus
     pygame.draw.rect(win, GREY, (0, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
     pygame.draw.rect(win, GREY, (GRID_X_OFFSET + GRID_WIDTH, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
 
-    # !!! THIS IS THE FIX !!!
-    # Draw a solid black rectangle to serve as the grid's "frame" or background.
-    # This will fill the padding areas with the border color.
+    # grid frame
     pygame.draw.rect(win, BLACK, (GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT))
-    # ---
 
-    # Calculate padding for centering the actual grid
+    # padding for variable size of grid
     gap = width // rows
     actual_grid_size = gap * rows
     padding = (width - actual_grid_size) // 2
 
-    # Draw the grid size text
+    # draw the grid size text
     font = pygame.font.SysFont("Arial", 22)
     usable_size = rows - 2
     size_text = font.render(f"{usable_size}x{usable_size} Grid", True, BLACK)
     button_x_right_menu = GRID_X_OFFSET + GRID_WIDTH + 50
-    text_center_x = button_x_right_menu + 100 # Center between the +/- buttons
+    text_center_x = button_x_right_menu + 100
     text_rect = size_text.get_rect(center=(text_center_x, 350))
     win.blit(size_text, text_rect)
 
-    # Draw all the spots on top of the new black background
     for row in grid:
         for spot in row:
             spot.draw(win, padding, padding)
 
-    # Draw the grid lines (if visible)
+
     if grid_lines_visible:
         for i in range(rows + 1):
-            pygame.draw.line(win, BLACK, (GRID_X_OFFSET + padding, GRID_Y_OFFSET + padding + i * gap), (GRID_X_OFFSET + padding + actual_grid_size, GRID_Y_OFFSET + padding + i * gap))
-            pygame.draw.line(win, BLACK, (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding), (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding + actual_grid_size))
+            # horizontal and vertical lines
+            pygame.draw.line(
+                win, BLACK, (GRID_X_OFFSET + padding, GRID_Y_OFFSET + padding + i * gap),
+                (GRID_X_OFFSET + padding + actual_grid_size, GRID_Y_OFFSET + padding + i * gap))
+            pygame.draw.line(
+                win, BLACK, (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding),
+                  (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding + actual_grid_size))
     
-    # Draw the UI buttons
+    # draw the ui buttons
     for button in buttons:
         button.draw(win)
 
-    # --- NEW: Draw Error Message ---
+    # draw the error message
     if error_message:
         error_font = pygame.font.SysFont("Arial", 18, bold=True)
         error_surface = error_font.render(error_message, True, (200, 0, 0))
@@ -69,14 +70,12 @@ def make_grid(rows, width):
     return grid
 
 def get_clicked_pos(pos, rows, width):
-    # !!! NEW: ACCOUNT FOR PADDING IN CLICK DETECTION !!!
     gap = width // rows
     actual_grid_size = gap * rows
     padding = (width - actual_grid_size) // 2
     
     x, y = pos
-
-    # Subtract global offset AND dynamic padding
+    # account for padding
     relative_x = x - GRID_X_OFFSET - padding
     relative_y = y - GRID_Y_OFFSET - padding
     
