@@ -1,6 +1,7 @@
 import re
 
 import easygui
+from grid import make_grid
 
 
 def get_matrix_input_popup():
