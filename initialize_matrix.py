@@ -2,6 +2,7 @@ import re
 
 import easygui
 from grid import make_grid
+from graphical_interface.spot import Spot
 
 
 def get_matrix_input_popup():
