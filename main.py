@@ -35,7 +35,12 @@ def main(win, width):
     small_font = pygame.font.SysFont("Arial", 30, bold=True) 
 
     buttons = Button.create_buttons(button_font, small_font)
-
+    algorithm_generator = {
+            "generator": None,
+            "running": False,
+            "step_interval_ms": 25,
+            "last_step_time": 0,
+        }
     run = True
     while run:
         draw(
@@ -49,9 +54,9 @@ def main(win, width):
         # handle events is a function that deals with all events
         # and returns the updated values of all relevant variables
         result = handle_events(
-            events, grid, current_rows, start_node, end_node, win, GRID_WIDTH,
+            run, events, grid, current_rows, start_node, end_node, win, GRID_WIDTH,
             currrent_square_colour, buttons, grid_lines_visible, drawing_mode,
-            error_message, current_algorithm
+            error_message, current_algorithm, algorithm_generator
         )
         # unpack all returned values
         (run, start_node, end_node, currrent_square_colour, 

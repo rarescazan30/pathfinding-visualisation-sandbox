@@ -29,7 +29,7 @@ def bfs(draw, grid, start_node, finish_node, visited_colour):
             
             if 0 <= r < len(grid) and 0 <= c < len(grid[0]):
                 neighbor = grid[r][c]
-                if neighbor not in visited and not neighbor.is_wall:
+                if neighbor not in visited and not neighbor.is_wall and not neighbor.is_closed():
                     visited.add(neighbor)
                     came_from[neighbor] = current_node
                     queue.append(neighbor)

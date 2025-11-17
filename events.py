@@ -52,7 +52,8 @@ def add_colors(color1, color2):
     return tuple(result)
 
 
-def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm):
+
+def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator):
     # unpack buttons for easier access
     (find_path_button, toggle_grid_button, toggle_mode_button, 
      decrease_button, increase_button, 
@@ -82,11 +83,17 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
             error_message = None
 
         if event.type == pygame.QUIT:
-            return False, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm
+            run = False
+
+        
+        if toggle_grid_button.is_clicked(event) or (event.type == pygame.KEYDOWN and event.key == pygame.K_g):
+                grid_lines_visible = not grid_lines_visible
+
+
 
         # clear former visualization when finding path
-        if find_path_button.is_clicked(event):
-            if start_node and end_node:
+        if find_path_button.is_clicked(event) or (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
+            if start_node and end_node and algorithm_generator["running"] == False:
                 for row in grid:
                     for spot in row:
                         spot.clear_visualization()
@@ -94,23 +101,20 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
                 
                 # instead of calling draw with all those arguments, we create a lambda function that captures the current state
                 draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message)
-                
                 if current_algorithm == "bfs":
-                    algorithm_generator = bfs(draw_lambda, grid, start_node, end_node, cur_square_color)
+                    algorithm_generator["generator"] = bfs(draw_lambda, grid, start_node, end_node, cur_square_color)
                 elif current_algorithm == "dfs":
-                    algorithm_generator = dfs(draw_lambda, grid, start_node, end_node, cur_square_color)
+                    algorithm_generator["generator"] = dfs(draw_lambda, grid, start_node, end_node, cur_square_color)
                 elif current_algorithm == "gbfs":
-                    algorithm_generator = greedyBestFirstSearch(draw_lambda, grid, start_node, end_node, cur_square_color)
-
+                    algorithm_generator["generator"] = greedyBestFirstSearch(draw_lambda, grid, start_node, end_node, cur_square_color)
+                algorithm_generator["running"] = True
+                algorithm_generator["last_step_time"] = pygame.time.get_ticks()
                 # we get those yields from the each algorithm which we run step by step
-                for _ in algorithm_generator: pass
-
+                
                 cur_square_color = add_colors(cur_square_color, (10, 10, 10))
                 pygame.event.clear(pygame.KEYDOWN) 
 
-        if toggle_grid_button.is_clicked(event):
-            grid_lines_visible = not grid_lines_visible
-
+        
         if toggle_mode_button.is_clicked(event):
             if drawing_mode == "maker":
                 drawing_mode = "eraser"
@@ -146,13 +150,15 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
             current_algorithm = "gbfs"
             print("Algorithm set to Greedy Best-First")
         
-        
-        
         grid_changed = False
         pygame.init()  # we use this to get the time for our continuous increase/decrease
         global last_update  # use global variable to track last update time
         
         if decrease_button.is_clicked(event) or increase_button.is_clicked(event):
+            # we stop the algorithm!
+            algorithm_generator["running"] = False
+            algorithm_generator["generator"] = None
+            algorithm_generator["last_step_time"] = 0
             first_pressed_time = pygame.time.get_ticks()
             # we want to decrease/increase WHILE the button is pressed
             while pygame.mouse.get_pressed()[0]:
@@ -183,6 +189,7 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
                         pygame.quit()
                         exit()
 
+        # handle our drawing and erasing on the map
         if pygame.mouse.get_pressed()[0] or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
             pos = pygame.mouse.get_pos()
             row, col = get_clicked_pos(pos, ROWS, width)
@@ -237,34 +244,27 @@ def handle_events(events, grid, ROWS, start_node, end_node, win, width, cur_squa
                     end_node = None
                     spot.reset()
         
-        # space resets all
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and start_node and end_node:
-                for row in grid:
-                    for spot in row:
-                        spot.clear_visualization()
-                
-                draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message)
+        # with c you reset the map
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
+            start_node = None
+            end_node = None
+            grid = make_grid(ROWS, width)
+            algorithm_generator["running"] = False
+            algorithm_generator["generator"] = None
+            algorithm_generator["last_step_time"] = 0
 
-                if current_algorithm == "bfs":
-                    algorithm_generator = bfs(draw_lambda, grid, start_node, end_node, cur_square_color)
-                elif current_algorithm == "dfs":
-                    algorithm_generator = dfs(draw_lambda, grid, start_node, end_node, cur_square_color)
-                elif current_algorithm == "gbfs":
-                    algorithm_generator = greedyBestFirstSearch(draw_lambda, grid, start_node, end_node, cur_square_color)
+    # if the grid size changed, we need to reset start and end nodes
+    # last condition of if is about how fast the steps update, this will be changed depending on difficulty.
+    current_ticks = pygame.time.get_ticks()
+    if algorithm_generator["running"] and algorithm_generator["generator"] and current_ticks - algorithm_generator["last_step_time"] >= algorithm_generator["step_interval_ms"]:
+        print("Algorithm step")
+        try:
+            next(algorithm_generator["generator"])
+        except StopIteration:
+            algorithm_generator["running"] = False
+            algorithm_generator["generator"] = None
+        algorithm_generator["last_step_time"] = current_ticks
 
-                # we get those yields from the each algorithm which we run step by step
-                for _ in algorithm_generator: pass
-                cur_square_color = add_colors(cur_square_color, (10, 10, 10))
-                pygame.event.clear(pygame.KEYDOWN)
-
-
-            # with c you reset the map
-            if event.key == pygame.K_c:
-                start_node = None
-                end_node = None
-                grid = make_grid(ROWS, width)
-
-    return True, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm
+    return run, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm
 
 
