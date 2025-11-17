@@ -19,23 +19,27 @@ class Button:
             text="Find Path", font=button_font,
             base_color=GREEN, hovering_color=BLUE)
         toggle_grid_button = Button(
-            x=button_x, y=180, width=200, height=50,
+            x=button_x, y=260, width=200, height=50,
             text="Toggle Grid", font=button_font,
             base_color=PURPLE, hovering_color=GREEN)
         toggle_mode_button = Button(
-            x=button_x, y=260, width=200, height=50,
+            x=button_x, y=340, width=200, height=50,
             text="Switch to Eraser", font=button_font,
             base_color=BUTTON_RED, hovering_color=HOVER_BUTTON_RED)
+        race_mode_button = Button(
+            x=button_x, y=180, width=200, height=50,
+            text="Race Mode: OFF", font=button_font,
+            base_color=GREEN, hovering_color=BLUE)
         decrease_button = Button(
-            x=button_x, y=380, width=50, height=50,
+            x=button_x, y=420, width=50, height=50,
             text="-", font=small_font,
             base_color=GREY, hovering_color=(190, 190, 190))
         increase_button = Button(
-            x=button_x + 150, y=380, width=50, height=50,
+            x=button_x + 150, y=420, width=50, height=50,
             text="+", font=small_font,
             base_color=GREY, hovering_color=(190, 190, 190))
         
-        left_button_x = 60
+        left_button_x = 40
         
         load_matrix_button = Button(
             x=left_button_x, y=100, width=200, height=50, 
@@ -66,7 +70,7 @@ class Button:
             find_path_button, toggle_grid_button, toggle_mode_button, 
             decrease_button, increase_button,
             load_matrix_button, save_matrix_button,
-            bfs_button, dfs_button, gbfs_button
+            bfs_button, dfs_button, gbfs_button, race_mode_button
         ]
 
     def draw(self, win):

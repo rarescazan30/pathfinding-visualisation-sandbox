@@ -15,7 +15,7 @@ from graphical_interface.spot import Spot
 # this could be bad practice (hard to debug), but:
 # they are distinctly named to ease debug (all uppercase)
 from graphical_interface.constants import *
-from initialize_matrix import get_matrix_input_popup, parse_and_load_matrix
+from initialize_matrix import parse_and_load_matrix, start_load_window
 
 
 def main(win, width):
@@ -42,12 +42,12 @@ def main(win, width):
             "last_step_time": 0,
         }
     run = True
+    race_mode = False
     while run:
         draw(
             win, grid, current_rows, GRID_WIDTH, buttons, 
             grid_lines_visible, error_message
         )
-        
         events = pygame.event.get()
         
 
@@ -56,29 +56,18 @@ def main(win, width):
         result = handle_events(
             run, events, grid, current_rows, start_node, end_node, win, GRID_WIDTH,
             currrent_square_colour, buttons, grid_lines_visible, drawing_mode,
-            error_message, current_algorithm, algorithm_generator
+            error_message, current_algorithm, algorithm_generator, race_mode
         )
         # unpack all returned values
         (run, start_node, end_node, currrent_square_colour, 
          grid, grid_lines_visible, drawing_mode, current_rows, 
-         error_message, current_algorithm) = result
+         error_message, current_algorithm, race_mode) = result
 
 
         if drawing_mode == "get_matrix":
-            # this will minimize the pygame window to avoid overlapping
-            pygame.display.iconify()
-            # disable key repeat to avoid input issues
-            pygame.key.set_repeat(0, 0)
             
-            matrix_text = get_matrix_input_popup()
-            
-            pygame.event.clear(pygame.MOUSEBUTTONDOWN)
-            pygame.event.clear(pygame.MOUSEBUTTONUP)
-            
-            pygame.key.set_repeat(500, 50) 
-            pygame.display.set_mode((TOTAL_WIDTH, TOTAL_HEIGHT))
-            
-            if matrix_text:
+            matrix_text = start_load_window(win)
+            if matrix_text is not None:
                 (new_grid, new_rows, new_start, new_end, err_msg) = \
                     parse_and_load_matrix(matrix_text, GRID_WIDTH)
                 
@@ -90,8 +79,7 @@ def main(win, width):
                     start_node = new_start
                     end_node = new_end
                     error_message = None
-            else:
-                error_message = "Load operation cancelled."
+            
             
             drawing_mode = "just_loaded"
 
@@ -100,6 +88,6 @@ def main(win, width):
 if __name__ == "__main__":
     WIN = pygame.display.set_mode((TOTAL_WIDTH, TOTAL_HEIGHT))
     pygame.display.set_caption("Pathfinding Visualisation Sandbox")
-    pygame.key.set_repeat(500, 50) 
+    
     main(WIN, GRID_WIDTH)
 

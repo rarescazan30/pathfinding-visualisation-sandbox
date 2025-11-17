@@ -1,14 +1,170 @@
 import re
+import pygame
+import pygame_textinput
+import pygame.scrap
 
 import easygui
 from grid import make_grid
 from graphical_interface.spot import Spot
+from graphical_interface.constants import *
 
 
-def get_matrix_input_popup():
-    msg = "Paste your matrix (0=path, 1=wall, 2=start, 3=end):"
-    title = "Load Labyrinth Matrix"
-    return easygui.codebox(msg, title, "") 
+""""
+
+def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message):
+    win.fill(WHITE)
+
+    # draw side menus
+    pygame.draw.rect(win, GREY, (0, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
+    pygame.draw.rect(win, GREY, (GRID_X_OFFSET + GRID_WIDTH, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
+
+    # grid frame
+    pygame.draw.rect(win, BLACK, (GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT))
+
+    # padding for variable size of grid
+    gap = width // rows
+    actual_grid_size = gap * rows
+    padding = (width - actual_grid_size) // 2
+
+    # draw the grid size text
+    font = pygame.font.SysFont("Arial", 22)
+    usable_size = rows - 2
+    size_text = font.render(f"{usable_size}x{usable_size} Grid", True, BLACK)
+    button_x_right_menu = GRID_X_OFFSET + GRID_WIDTH + 50
+    text_center_x = button_x_right_menu + 100
+    text_rect = size_text.get_rect(center=(text_center_x, 350))
+    win.blit(size_text, text_rect)
+
+    for row in grid:
+        for spot in row:
+            spot.draw(win, padding, padding)
+
+
+    if grid_lines_visible:
+        for i in range(rows + 1):
+            # horizontal and vertical lines
+            pygame.draw.line(
+                win, BLACK, (GRID_X_OFFSET + padding, GRID_Y_OFFSET + padding + i * gap),
+                (GRID_X_OFFSET + padding + actual_grid_size, GRID_Y_OFFSET + padding + i * gap))
+            pygame.draw.line(
+                win, BLACK, (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding),
+                  (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding + actual_grid_size))
+    
+    # draw the ui buttons
+    for button in buttons:
+        button.draw(win)
+
+    # draw the error message
+    if error_message:
+        error_font = pygame.font.SysFont("Arial", 18, bold=True)
+        error_surface = error_font.render(error_message, True, (200, 0, 0))
+        error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, 480))
+        win.blit(error_surface, error_rect)
+
+    pygame.display.update()
+
+
+"""
+def draw_for_load_window(win, text_surface, input_rect, paste_btn_rect, done_btn_rect):
+    width, height = win.get_width(), win.get_height()
+    win.fill(WHITE)
+
+    box_w, box_h = 600, 300
+    box_x = (width - box_w) // 2
+    box_y = (height - box_h) // 2
+
+    # panel first
+    pygame.draw.rect(win, GREY, (box_x, box_y, box_w, box_h))
+
+    # input area and its text
+    pygame.draw.rect(win, WHITE, input_rect)
+    win.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+
+    
+
+
+
+    mouse_pos = pygame.mouse.get_pos()
+    color_done = RED if done_btn_rect.collidepoint(mouse_pos) else GREEN
+    color_paste = RED if paste_btn_rect.collidepoint(mouse_pos) else GREEN
+    pygame.draw.rect(win, color_paste, paste_btn_rect, border_radius=12)
+    pygame.draw.rect(win, color_done, done_btn_rect, border_radius=12)
+    btn_font = pygame.font.SysFont("Arial", 14, bold=True)
+    btn_text = btn_font.render("   Click to paste your matrix!\n(0=path, 1=wall, 2=start, 3=end)", True, WHITE)
+    btn_text_done = btn_font.render("Done", True, WHITE)
+    win.blit(btn_text, btn_text.get_rect(center=paste_btn_rect.center))
+    win.blit(btn_text_done, btn_text_done.get_rect(center=done_btn_rect.center))
+
+    pygame.display.update()
+
+
+# we want to see the text nicely displayed on our page
+def wrap_text(s: str) -> str:
+    s = s.replace("\r", "").strip("\x00")
+    wrapped = []
+    for line in s.split("\n"):
+        while len(line) > 90:
+            wrapped.append(line[:90])
+            line = line[90:]
+        wrapped.append(line)
+    return "\n".join(wrapped)
+
+def start_load_window(win):
+    # clipboard
+    pygame.scrap.init()
+    
+    textinput = pygame_textinput.TextInputVisualizer(font_color=BLACK, cursor_color=BLACK)
+    
+    w, h = win.get_width(), win.get_height()
+    box_center_x = w // 2
+    box_center_y = h // 2
+    
+    # input box
+    input_rect = pygame.Rect(10, 150, w - 200, h)
+    
+    paste_btn_rect = pygame.Rect(10, 10, 300, 60)
+
+    done_btn_rect = pygame.Rect(w - 260, 10, 250, 60)
+
+    run_load = True
+
+    while run_load:
+        events = pygame.event.get()
+        textinput.update(events)
+        textinput.value = wrap_text(textinput.value)
+        
+        draw_for_load_window(win, textinput.surface, input_rect, paste_btn_rect, done_btn_rect)
+
+        for event in events:
+            if event.type == pygame.QUIT:
+                return None
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if paste_btn_rect.collidepoint(event.pos):
+                    # we get clipboard content
+                    content = pygame.scrap.get(pygame.SCRAP_TEXT)
+                    if content:
+                        if isinstance(content, bytes):
+                            text = content.decode("utf-8", errors="ignore")
+                        else:
+                            text = str(content)
+                        # we want to show the text in the input box so we wrap
+                        textinput.value += text
+                        textinput.value = wrap_text(textinput.value)
+
+                if done_btn_rect.collidepoint(event.pos):
+                    if len(textinput.value.strip()) is not 0:
+                        return textinput.value
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return None
+                if event.key == pygame.K_RETURN:
+                    if len(textinput.value.strip()) is not 0:
+                        return textinput.value
+                    
+    return None
+
 
 def parse_and_load_matrix(matrix_text, width):
     if not matrix_text: 

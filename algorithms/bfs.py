@@ -7,7 +7,7 @@ def reconstruct_path(came_from, current, draw):
     while current in came_from:
         current = came_from[current]
         current.mark_path()
-        draw()
+        # draw() # this is really important, we already draw in the main loop!!!
 
 def bfs(draw, grid, start_node, finish_node, visited_colour):
     queue = deque([start_node])
@@ -35,7 +35,7 @@ def bfs(draw, grid, start_node, finish_node, visited_colour):
                     queue.append(neighbor)
                     neighbor.mark_open()
 
-        draw() # redraw the grid to show the new open/closed nodes
+        # draw() # this is really important, we already draw in the main loop!!! we dont need this!
 
         if current_node != start_node:
             current_node.mark_closed(visited_colour)

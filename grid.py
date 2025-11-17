@@ -49,9 +49,9 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message):
 
     # draw the error message
     if error_message:
-        error_font = pygame.font.SysFont("Arial", 18, bold=True)
-        error_surface = error_font.render(error_message, True, (200, 0, 0))
-        error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, 480))
+        error_font = pygame.font.SysFont("Arial", 35, bold=True)
+        error_surface = error_font.render(error_message, True, BUTTON_RED)
+        error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, 500))
         win.blit(error_surface, error_rect)
 
     pygame.display.update()

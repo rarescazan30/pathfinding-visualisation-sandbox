@@ -2,6 +2,7 @@ import pygame
 import random
 import pyperclip
 import re
+import time
 
 from graphical_interface.constants import *
 from graphical_interface.spot import Spot
@@ -53,12 +54,12 @@ def add_colors(color1, color2):
 
 
 
-def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator):
+def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator, race_mode):
     # unpack buttons for easier access
     (find_path_button, toggle_grid_button, toggle_mode_button, 
      decrease_button, increase_button, 
      load_matrix_button, save_matrix_button,
-     bfs_button, dfs_button, gbfs_button) = buttons
+     bfs_button, dfs_button, gbfs_button, race_mode_button) = buttons
     
     # reset all to inactive color
     bfs_button.base_color = PURPLE
@@ -84,12 +85,6 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
 
         if event.type == pygame.QUIT:
             run = False
-
-        
-        if toggle_grid_button.is_clicked(event) or (event.type == pygame.KEYDOWN and event.key == pygame.K_g):
-                grid_lines_visible = not grid_lines_visible
-
-
 
         # clear former visualization when finding path
         if find_path_button.is_clicked(event) or (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
@@ -126,6 +121,20 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                 toggle_mode_button.update_text("Switch to Eraser")
                 toggle_mode_button.base_color = BUTTON_RED
                 toggle_mode_button.hovering_color = HOVER_BUTTON_RED
+        
+        
+        if race_mode_button.is_clicked(event):
+            if race_mode == False:
+                race_mode = True
+                race_mode_button.update_text("Race Mode: OFF")
+                race_mode_button.base_color = GREEN
+                race_mode_button.hovering_color = BLUE
+            else:
+                race_mode = False
+                race_mode_button.update_text("Race Mode: ON")
+                race_mode_button.base_color = BUTTON_RED
+                race_mode_button.hovering_color = HOVER_BUTTON_RED
+
 
         if save_matrix_button.is_clicked(event):
             internal_grid = [row[1:-1] for row in grid[1:-1]]
@@ -151,6 +160,12 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
             print("Algorithm set to Greedy Best-First")
         
         grid_changed = False
+
+        if toggle_grid_button.is_clicked(event) or (event.type == pygame.KEYDOWN and event.key == pygame.K_g):
+                grid_lines_visible = not grid_lines_visible
+                grid_changed = True
+
+
         pygame.init()  # we use this to get the time for our continuous increase/decrease
         global last_update  # use global variable to track last update time
         
@@ -265,6 +280,6 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
             algorithm_generator["generator"] = None
         algorithm_generator["last_step_time"] = current_ticks
 
-    return run, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm
+    return run, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm, race_mode
 
 
