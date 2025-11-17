@@ -150,18 +150,19 @@ def start_load_window(win):
                             text = str(content)
                         # we want to show the text in the input box so we wrap
                         textinput.value += text
+                        return_textvalue = textinput.value
                         textinput.value = wrap_text(textinput.value)
 
                 if done_btn_rect.collidepoint(event.pos):
                     if len(textinput.value.strip()) is not 0:
-                        return textinput.value
+                        return return_textvalue
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return None
                 if event.key == pygame.K_RETURN:
                     if len(textinput.value.strip()) is not 0:
-                        return textinput.value
+                        return return_textvalue
                     
     return None
 
