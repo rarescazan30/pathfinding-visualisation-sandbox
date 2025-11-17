@@ -128,16 +128,19 @@ def start_load_window(win):
 
     run_load = True
 
+    return_textvalue = ""
     while run_load:
         events = pygame.event.get()
         textinput.update(events)
+        return_textvalue = textinput.value
         textinput.value = wrap_text(textinput.value)
         
         draw_for_load_window(win, textinput.surface, input_rect, paste_btn_rect, done_btn_rect)
 
         for event in events:
             if event.type == pygame.QUIT:
-                return None
+                return return_textvalue
+            
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if paste_btn_rect.collidepoint(event.pos):
@@ -150,21 +153,20 @@ def start_load_window(win):
                             text = str(content)
                         # we want to show the text in the input box so we wrap
                         textinput.value += text
-                        return_textvalue = textinput.value
+                        return_textvalue += text
                         textinput.value = wrap_text(textinput.value)
 
                 if done_btn_rect.collidepoint(event.pos):
-                    if len(textinput.value.strip()) is not 0:
-                        return return_textvalue
+                    return return_textvalue
+                    
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return None
+                    return return_textvalue
                 if event.key == pygame.K_RETURN:
-                    if len(textinput.value.strip()) is not 0:
-                        return return_textvalue
-                    
-    return None
+                    return return_textvalue
+  
+    return return_textvalue
 
 
 def parse_and_load_matrix(matrix_text, width):
