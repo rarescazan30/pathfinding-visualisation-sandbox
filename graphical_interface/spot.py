@@ -8,19 +8,20 @@ class Spot:
         self.width = width
         self.x = col * width
         self.y = row * width
-        self.colour = WHITE
+        self.colour = WHITE # Culoarea este încă folosită pentru logică!
         self.neighbors = []
         self.total_rows = total_rows
         self.is_start = False
         self.is_end = False
         self.is_wall = False
-        self.is_visited = False
+        self.is_visited = False # Folosim asta pentru 'margin_of_search'
         self.parent = None
 
     def get_pos(self):
         return self.row, self.col
     
     def is_closed(self):
+        # Logica rămâne bazată pe culoare
         return self.colour == RED
     
     def is_open(self):
@@ -29,10 +30,10 @@ class Spot:
     def is_barrier(self):
         return self.is_wall
     
-    def is_start(self):
+    def is_start_node(self): # Am redenumit-o pentru a evita conflictul
         return self.is_start
     
-    def is_end(self):
+    def is_end_node(self): # Am redenumit-o pentru a evita conflictul
         return self.is_end
 
     def clear_visualization(self):
@@ -64,7 +65,7 @@ class Spot:
 
     def mark_path(self):
         self.colour = PURPLE
-        self.is_visited = True
+        self.is_visited = True # O cale este și vizitată
         
     def reset(self):
         self.colour = WHITE
@@ -74,7 +75,55 @@ class Spot:
         self.is_end = False
         self.is_start = False
 
-    def draw(self, win, padding_x, padding_y):
+    def draw(self, win, padding_x, padding_y, texture_manager):
+        # Am adăugat texture_manager ca parametru
+        
         final_x = self.x + GRID_X_OFFSET + padding_x
         final_y = self.y + GRID_Y_OFFSET + padding_y
-        pygame.draw.rect(win, self.colour, (final_x, final_y, self.width, self.width))
+        
+        # --- Logică Nouă pentru Texturi ---
+        
+        # 1. Stabilim ce categorie de textură să folosim
+        # Categoriile tale: 'start', 'end', 'path', 'background', 'search', 'margin_of_search', 'wall'
+        
+        category = 'background' # Default (fundal gol)
+        
+        if self.is_start:
+            category = 'start'
+        elif self.is_end:
+            category = 'end'
+        elif self.is_wall:
+            category = 'wall'
+        elif self.colour == PURPLE: # Calea finală
+            category = 'path'
+        elif self.colour == GREEN: # Noduri deschise (în curs de căutare)
+            category = 'search'
+        elif self.is_visited: # Noduri închise (deja vizitate)
+            # Ne asigurăm că nu e start, end, sau path, care sunt și ele "visited"
+            category = 'margin_of_search'
+            
+        # Cazuri speciale pentru a nu suprascrie start/end/path
+        if self.is_start:
+            category = 'start'
+        elif self.is_end:
+            category = 'end'
+        elif self.colour == PURPLE:
+            category = 'path'
+
+
+        # 2. Obținem textura corectă (deja scalată) de la manager
+        try:
+            texture_to_draw = texture_manager.get_active_texture(category)
+        except Exception as e:
+            # Fallback în caz de eroare (de ex. la prima randare)
+            print(f"Eroare la get_active_texture pentru {category}: {e}")
+            pygame.draw.rect(win, self.colour, (final_x, final_y, self.width, self.width))
+            return
+
+        # 3. Desenăm textura
+        win.blit(texture_to_draw, (final_x, final_y))
+        
+        # --- Sfârșit Logică Nouă ---
+        
+        # Am înlocuit linia de mai jos:
+        # pygame.draw.rect(win, self.colour, (final_x, final_y, self.width, self.width))

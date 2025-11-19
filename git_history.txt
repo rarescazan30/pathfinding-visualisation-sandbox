@@ -1,0 +1,52 @@
+* bdbe225 (HEAD -> sebi, origin/sebi) fix(eraser tool): eraser tool deletes walls only
+* 7c8e785 (origin/main, origin/branch-rares, origin/HEAD, main, branch-rares) chore: minor clarity change
+* d82b5ae chore: minor clairty changes
+* f75e9c5 chore: minor clairty changes
+* 4ae25f9 feat: implemented hold to increase/decrease grid size. made minor structure changes for cleaner code. testing on linux needs to be done with events.py change at line 200
+* 6cc5a57 fix: imported spot
+* e8fd241 fix: included grid import in new file initialize_matrix
+*   932bca7 chore: pulled and fixed conflicts with origin/branch-rares
+|\  
+| * 4d07bad feat(algorithm): Added best_first_search algorithm
+| * 69c70ea feat(algorithm): added and implemented  dfs.py in algorithms
+| * c2ef9c3 fix(eraser tool): eraser tool deletes walls only
+| *   7e73260 Merge branch 'sebi'
+| |\  
+| * | 690fe6f Minor update to test contributor visibility
+* | | fffe125 chore: made separate initialize_matrix file for cleaner code
+* | | c52646d fix: Made a better way to choose algorithms & error message for matrix loading
+* | | 7a84319 feat!(menu): Implement "Load/Save Labyrinth" feature and fix critical bugs
+* | | 6b525ae feat(algorithm): Added best_first_search algorithm
+* | | 0939ce2 feat(algorithm): added and implemented  dfs.py in algorithms
+* | | a2435ed fix(eraser tool): eraser tool deletes walls only
+* | | 4211f61 Minor update to test contributor visibility
+| |/  
+|/|   
+| | * 6a97544 (refs/stash) On sebi: temp
+| |/| 
+|/| | 
+| | * 42a6418 index on sebi: b00e896 Implemented adjustable grid size with dynamic centering
+| |/  
+|/|   
+* | b00e896 Implemented adjustable grid size with dynamic centering
+|/  
+* 5d34875 Implemented UI menu, grid toggle, eraser
+| * 8d4f48f (origin/test_branch, test_branch) Experimental: Added start/end textures, outer barrier and barrier textures. Made it so barrier has both texture and colour. Made shared.py to share visited colour with barrier colour for visual effect
+| * 8b90d3c Changed display.update -> display.flip (better)
+|/  
+* ca4623f Modularised code. Implement color change for each run
+* c1a714f Beta pathfinding BFS 1.0
+* 7671a7a Fixed drag click
+* 55cb549 Changes bfs algorithm
+* 6163ff0 Mixed contributions to a working program
+*   83ae4c5 Rebased with origin. Changed directory to graphical interface
+|\  
+| * 7f6827d Changed main.py to print matrix
+| * 2b6a408 Implemented grid structure logic
+* | 206aa2e Implemented spot.py + backend compatibility.
+* | 2e3ff61 Renamed main.py -> graphical_interface. Made new directory. Added basic display window for game
+|/  
+* 541c427 Added libraries in main.py
+* 586c43c Added main.py
+* aee1066 Initial commit
+* 12acec6 (origin/master) Initial commit

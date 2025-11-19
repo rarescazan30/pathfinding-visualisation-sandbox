@@ -1,17 +1,19 @@
-
 import pygame
 from graphical_interface.spot import Spot
 from graphical_interface.constants import *
 
 
-def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message):
+def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, texture_manager):
+    # Am adăugat texture_manager ca parametru
+    
+    # Fundalul general (poate fi o textură de fundal în viitor)
     win.fill(WHITE)
 
     # draw side menus
     pygame.draw.rect(win, GREY, (0, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
     pygame.draw.rect(win, GREY, (GRID_X_OFFSET + GRID_WIDTH, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
 
-    # grid frame
+    # grid frame (nu grila în sine, ci chenarul ei)
     pygame.draw.rect(win, BLACK, (GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT))
 
     # padding for variable size of grid
@@ -24,13 +26,20 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message):
     usable_size = rows - 2
     size_text = font.render(f"{usable_size}x{usable_size} Grid", True, BLACK)
     button_x_right_menu = GRID_X_OFFSET + GRID_WIDTH + 50
-    text_center_x = button_x_right_menu + 100
-    text_rect = size_text.get_rect(center=(text_center_x, 350))
+    text_center_x = button_x_right_menu + 100 # Centrul e OK
+    # --- MODIFICARE: Am ajustat poziția Y ---
+    # Mutat la 345 (era 350) pentru a se centra în noul spațiu
+    text_rect = size_text.get_rect(center=(text_center_x, 345)) 
+    # --- SFÂRȘIT MODIFICARE ---
     win.blit(size_text, text_rect)
 
+    # --- Modificare Texturi ---
+    # Desenăm texturile
     for row in grid:
         for spot in row:
-            spot.draw(win, padding, padding)
+            # Pasăm managerul la funcția 'draw' a fiecărui spot
+            spot.draw(win, padding, padding, texture_manager)
+    # --- Sfârșit Modificare ---
 
 
     if grid_lines_visible:
@@ -51,7 +60,8 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message):
     if error_message:
         error_font = pygame.font.SysFont("Arial", 20, bold=True)
         error_surface = error_font.render(error_message, True, BUTTON_RED)
-        error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, 500))
+        # L-am mutat mai jos pentru a nu se suprapune cu butoanele noi
+        error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, TOTAL_HEIGHT - 30))
         win.blit(error_surface, error_rect)
 
     pygame.display.update()
@@ -64,6 +74,7 @@ def make_grid(rows, width):
         grid.append([])
         for j in range(rows):
             spot = Spot(i, j, gap, rows)
+            # Acum, pereții de margine vor folosi și ei textura 'wall'
             if i == 0 or i == rows - 1 or j == 0 or j == rows - 1:
                 spot.mark_barrier()
             grid[i].append(spot)

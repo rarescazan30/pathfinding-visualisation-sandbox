@@ -1,5 +1,6 @@
 import random
 import re
+import os # Necesar pentru a verifica existența folderului de assets
 
 import easygui
 import pygame
@@ -9,18 +10,26 @@ from algorithms.dfs import dfs
 from algorithms.best_first_search import greedyBestFirstSearch
 from events import handle_events
 from grid import draw, get_clicked_pos, make_grid
-from graphical_interface.button import Button
+# --- MODIFICARE ---
+# Am adăugat 'create_buttons' la import
+from graphical_interface.button import Button, ImageButton, create_buttons
+# --- SFÂRȘIT MODIFICARE ---
 from graphical_interface.spot import Spot
-# since we are using many constants, import all
-# this could be bad practice (hard to debug), but:
-# they are distinctly named to ease debug (all uppercase)
 from graphical_interface.constants import *
 from initialize_matrix import parse_and_load_matrix, start_load_window
-
+from texture_manager import TextureManager # Importăm noul manager
 
 def main(win, width):
+    
+    # Verificăm dacă folderul de assets există
+    if not os.path.isdir('assets/textures'):
+        print("EROARE: Folderul 'assets/textures' nu a fost găsit.")
+        print("Te rog asigură-te că ai 21 de imagini în 'assets/textures'")
+        pygame.quit()
+        return
+
     current_rows = 40
-    grid = make_grid(current_rows, GRID_WIDTH)
+    
     currrent_square_colour = RED
     start_node = None
     end_node = None
@@ -33,8 +42,25 @@ def main(win, width):
     pygame.font.init()
     button_font = pygame.font.SysFont("Arial", 24)
     small_font = pygame.font.SysFont("Arial", 30, bold=True) 
+    
+    # --- Modificări pentru Texturi ---
+    # 1. Inițializăm managerul (încarcă imaginile originale)
+    texture_manager = TextureManager()
+    
+    # 2. Creăm grila
+    grid = make_grid(current_rows, GRID_WIDTH)
+    
+    # 3. Calculăm gap-ul inițial și actualizăm texturile scalate
+    gap = GRID_WIDTH // current_rows
+    texture_manager.update_scaled_textures(gap)
+    
+    # 4. Pasăm managerul de texturi la funcția de creare a butoanelor
+    # --- MODIFICARE ---
+    # Am eliminat 'Button.' din apel
+    buttons = create_buttons(button_font, small_font, texture_manager)
+    # --- SFÂRȘIT MODIFICARE ---
+    # --- Sfârșitul modificărilor pentru texturi ---
 
-    buttons = Button.create_buttons(button_font, small_font)
     algorithm_generator = {
             "generator": None,
             "running": False,
@@ -43,25 +69,42 @@ def main(win, width):
         }
     run = True
     race_mode = False
+    
+    clock = pygame.time.Clock() # Adăugăm un ceas pentru a controla FPS-ul
+    
     while run:
+        # Pasăm și managerul de texturi funcției 'draw'
         draw(
             win, grid, current_rows, GRID_WIDTH, buttons, 
-            grid_lines_visible, error_message
+            grid_lines_visible, error_message, texture_manager
         )
+        
         events = pygame.event.get()
         
-
-        # handle events is a function that deals with all events
-        # and returns the updated values of all relevant variables
+        # Pasăm managerul de texturi și la 'handle_events'
         result = handle_events(
             run, events, grid, current_rows, start_node, end_node, win, GRID_WIDTH,
             currrent_square_colour, buttons, grid_lines_visible, drawing_mode,
-            error_message, current_algorithm, algorithm_generator, race_mode
+            error_message, current_algorithm, algorithm_generator, race_mode,
+            texture_manager # Adăugat
         )
         # unpack all returned values
         (run, start_node, end_node, currrent_square_colour, 
          grid, grid_lines_visible, drawing_mode, current_rows, 
          error_message, current_algorithm, race_mode) = result
+        
+
+        # Logica pentru rularea algoritmului (mutată din events.py pentru claritate)
+        current_ticks = pygame.time.get_ticks()
+        if algorithm_generator["running"] and algorithm_generator["generator"] and \
+           current_ticks - algorithm_generator["last_step_time"] >= algorithm_generator["step_interval_ms"]:
+            
+            try:
+                next(algorithm_generator["generator"])
+            except StopIteration:
+                algorithm_generator["running"] = False
+                algorithm_generator["generator"] = None
+            algorithm_generator["last_step_time"] = current_ticks
 
 
         if drawing_mode == "get_matrix":
@@ -79,9 +122,15 @@ def main(win, width):
                     start_node = new_start
                     end_node = new_end
                     error_message = None
-            
+                    # --- Modificare Texturi ---
+                    # Recalculăm texturile scalate pentru noua mărime a grilei
+                    gap = GRID_WIDTH // current_rows
+                    texture_manager.update_scaled_textures(gap)
+                    # --- Sfârșit Modificare ---
             
             drawing_mode = "just_loaded"
+        
+        clock.tick(60) # Limităm la 60 FPS
 
     pygame.quit()
 
@@ -90,4 +139,3 @@ if __name__ == "__main__":
     pygame.display.set_caption("Pathfinding Visualisation Sandbox")
     
     main(WIN, GRID_WIDTH)
-
