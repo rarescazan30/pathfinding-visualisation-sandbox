@@ -133,7 +133,6 @@ def start_load_window(win):
         events = pygame.event.get()
         textinput.update(events)
         return_textvalue = textinput.value
-        textinput.value = wrap_text(textinput.value)
         
         draw_for_load_window(win, textinput.surface, input_rect, paste_btn_rect, done_btn_rect)
 
@@ -153,8 +152,8 @@ def start_load_window(win):
                             text = str(content)
                         # we want to show the text in the input box so we wrap
                         textinput.value += text
-                        return_textvalue += text
-                        textinput.value = wrap_text(textinput.value)
+                        return_textvalue = content
+                        # textinput.value = wrap_text(textinput.value)
 
                 if done_btn_rect.collidepoint(event.pos):
                     return return_textvalue
@@ -175,6 +174,7 @@ def parse_and_load_matrix(matrix_text, width):
     lines = matrix_text.strip().split('\n')
     rows = len(lines)
     if not (10 <= rows <= 60):
+        print(rows)
         return None, None, None, None, "Invalid matrix."
     parsed_matrix = []
     start_count = 0
@@ -188,6 +188,7 @@ def parse_and_load_matrix(matrix_text, width):
             return None, None, None, None, f"Invalid characters in row {r+1}."
         cols = cleaned_line.split(' ')
         if len(cols) != rows:
+            print(len(cols), rows)
             return None, None, None, None, "Matrix is not square."
         # we get the number of starts and ends on each row
         start_count += cols.count('2')
