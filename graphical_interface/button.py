@@ -121,6 +121,23 @@ def create_buttons(button_font, small_font, texture_manager):
     all_buttons.append(increase_button)
     current_y += 70 
 
+     # --- MODIFICARE: Butonul Presets ---
+    btn_width_large = 200 # Refolosim lățimea
+    btn_x_large = RIGHT_MENU_START_X + (RIGHT_MENU_WIDTH - btn_width_large) // 2
+    
+    presets_button = Button(
+        x=btn_x_large, y=current_y, width=btn_width_large, height=50,
+        text="Presets", font=button_font,
+        base_color=ORANGE, hovering_color=YELLOW # Culoare distinctă
+    )
+    # Suprascriem culoarea textului să fie neagră pentru contrast pe galben/portocaliu
+    presets_button.text_color = BLACK 
+    all_buttons.append(presets_button)
+    
+    current_y += 70
+    # --- SFÂRȘIT MODIFICARE ---
+    
+    
     # --- MODIFICARE: 3 Butoane de I/O ---
     # Rândul 1: Load (Mac) și Load (Win)
     padding = 10

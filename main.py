@@ -12,10 +12,9 @@ from grid import draw, get_clicked_pos, make_grid
 from graphical_interface.button import Button, ImageButton, create_buttons
 from graphical_interface.spot import Spot
 from graphical_interface.constants import *
-# --- MODIFICARE: Am adus înapoi get_matrix_input_popup ---
 from initialize_matrix import parse_and_load_matrix, start_load_window, get_matrix_input_popup
-# --- SFÂRȘIT MODIFICARE ---
 from texture_manager import TextureManager 
+from preset_chooser import start_preset_chooser
 
 def main(win, width):
     
@@ -58,14 +57,19 @@ def main(win, width):
     run = True
     race_mode = False
     
+    show_secret_message = False
+    
     clock = pygame.time.Clock() 
     
     while run:
         draw(
             win, grid, current_rows, GRID_WIDTH, buttons, 
-            grid_lines_visible, error_message, texture_manager
+            grid_lines_visible, error_message, texture_manager,
+            show_secret_message 
         )
         
+        previous_rows = current_rows
+
         events = pygame.event.get()
         
         result = handle_events(
@@ -78,6 +82,8 @@ def main(win, width):
          grid, grid_lines_visible, drawing_mode, current_rows, 
          error_message, current_algorithm, race_mode) = result
         
+        if current_rows != previous_rows:
+             show_secret_message = False
 
         current_ticks = pygame.time.get_ticks()
         if algorithm_generator["running"] and algorithm_generator["generator"] and \
@@ -91,39 +97,16 @@ def main(win, width):
             algorithm_generator["last_step_time"] = current_ticks
 
 
-        # --- MODIFICARE: Separare clară între Mac și Windows ---
-        if drawing_mode == "get_matrix_mac":
-            # Varianta Custom UI (pentru Mac)
-            matrix_text = start_load_window(win, use_pyperclip=True)
+        if drawing_mode == "choose_preset":
+            result = start_preset_chooser(win)
             
-            if matrix_text is not None:
-                (new_grid, new_rows, new_start, new_end, err_msg) = \
-                    parse_and_load_matrix(matrix_text, GRID_WIDTH)
-                
-                if err_msg:
-                    error_message = err_msg
-                else:
-                    grid = new_grid
-                    current_rows = new_rows
-                    start_node = new_start
-                    end_node = new_end
-                    error_message = None
-                    gap = GRID_WIDTH // current_rows
-                    texture_manager.update_scaled_textures(gap)
-            drawing_mode = "just_loaded"
-
-        elif drawing_mode == "get_matrix_win":
-            # Varianta EasyGUI Originală (pentru Windows/Linux)
+            pygame.event.clear()
             
-            # Minimizăm pentru a evita probleme de focus
-            pygame.display.iconify()
+            matrix_text = None
+            is_secret = False
             
-            matrix_text = get_matrix_input_popup()
-            
-            # Curățăm evenimentele și restaurăm
-            pygame.event.clear(pygame.MOUSEBUTTONDOWN)
-            pygame.event.clear(pygame.MOUSEBUTTONUP)
-            pygame.display.set_mode((TOTAL_WIDTH, TOTAL_HEIGHT))
+            if result:
+                matrix_text, is_secret = result
             
             if matrix_text:
                 (new_grid, new_rows, new_start, new_end, err_msg) = \
@@ -139,11 +122,65 @@ def main(win, width):
                     error_message = None
                     gap = GRID_WIDTH // current_rows
                     texture_manager.update_scaled_textures(gap)
+                    
+                    show_secret_message = is_secret
+            
+            # --- FIX: Setăm modul "just_loaded" și așteptăm ridicarea click-ului ---
+            drawing_mode = "just_loaded"
+            pygame.event.clear() # Curățăm orice click rezidual
+
+        if drawing_mode == "get_matrix_mac":
+            matrix_text = start_load_window(win, use_pyperclip=True)
+            
+            pygame.event.clear()
+            
+            if matrix_text is not None:
+                (new_grid, new_rows, new_start, new_end, err_msg) = \
+                    parse_and_load_matrix(matrix_text, GRID_WIDTH)
+                
+                if err_msg:
+                    error_message = err_msg
+                else:
+                    grid = new_grid
+                    current_rows = new_rows
+                    start_node = new_start
+                    end_node = new_end
+                    error_message = None
+                    gap = GRID_WIDTH // current_rows
+                    texture_manager.update_scaled_textures(gap)
+                    show_secret_message = False 
+            
+            drawing_mode = "just_loaded"
+            pygame.event.clear()
+
+        elif drawing_mode == "get_matrix_win":
+            pygame.display.iconify()
+            matrix_text = get_matrix_input_popup()
+            
+            pygame.display.set_mode((TOTAL_WIDTH, TOTAL_HEIGHT))
+            
+            pygame.event.clear()
+            
+            if matrix_text:
+                (new_grid, new_rows, new_start, new_end, err_msg) = \
+                    parse_and_load_matrix(matrix_text, GRID_WIDTH)
+                
+                if err_msg:
+                    error_message = err_msg
+                else:
+                    grid = new_grid
+                    current_rows = new_rows
+                    start_node = new_start
+                    end_node = new_end
+                    error_message = None
+                    gap = GRID_WIDTH // current_rows
+                    texture_manager.update_scaled_textures(gap)
+                    show_secret_message = False 
             else:
                 error_message = "Load operation cancelled."
             
             drawing_mode = "just_loaded"
-        # --- SFÂRȘIT MODIFICARE ---
+            pygame.event.clear() # Încă o curățare pentru siguranță
         
         clock.tick(60) 
 

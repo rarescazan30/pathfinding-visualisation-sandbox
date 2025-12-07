@@ -9,16 +9,10 @@ from grid import make_grid
 from graphical_interface.spot import Spot
 from graphical_interface.constants import *
 
-# --- ADAUGAT DIN NOU (PENTRU WINDOWS) ---
 def get_matrix_input_popup():
-    """
-    Varianta originală cu EasyGUI pentru Windows/Linux.
-    Deschide o fereastră nativă de sistem.
-    """
     msg = "Paste your matrix (0=path, 1=wall, 2=start, 3=end):"
     title = "Load Labyrinth Matrix"
     return easygui.codebox(msg, title, "") 
-# --- SFÂRȘIT ---
 
 def draw_for_load_window(win, text_input_value, input_rect, paste_btn_rect, done_btn_rect, font_object):
     width, height = win.get_width(), win.get_height()
@@ -34,11 +28,8 @@ def draw_for_load_window(win, text_input_value, input_rect, paste_btn_rect, done
     # input area
     pygame.draw.rect(win, WHITE, input_rect)
 
-    # Creăm suprafața de afișare AICI, pe baza textului wrap-uit
     wrapped_text = wrap_text(text_input_value)
     
-    # pygame-textinput nu randează multi-linie implicit,
-    # așa că o facem noi manual.
     lines = wrapped_text.split('\n')
     y_offset = input_rect.y + 5
     x_pos = input_rect.x + 5
@@ -46,7 +37,7 @@ def draw_for_load_window(win, text_input_value, input_rect, paste_btn_rect, done
     for line in lines:
         text_surface = font_object.render(line, True, BLACK)
         win.blit(text_surface, (x_pos, y_offset))
-        y_offset += font_object.get_linesize() # Mutăm la linia următoare
+        y_offset += font_object.get_linesize() 
 
 
     mouse_pos = pygame.mouse.get_pos()
@@ -63,7 +54,6 @@ def draw_for_load_window(win, text_input_value, input_rect, paste_btn_rect, done
     pygame.display.update()
 
 
-# we want to see the text nicely displayed on our page
 def wrap_text(s: str) -> str:
     s = s.replace("\r", "").strip("\x00")
     wrapped = []
@@ -74,16 +64,15 @@ def wrap_text(s: str) -> str:
         wrapped.append(line)
     return "\n".join(wrapped)
 
-# Aceasta este acum STRICT varianta pentru MAC/Custom UI
 def start_load_window(win, use_pyperclip=True):
+    if not use_pyperclip:
+        pygame.scrap.init()
     
     textinput = pygame_textinput.TextInputVisualizer(font_color=BLACK, cursor_color=BLACK)
     
     w, h = win.get_width(), win.get_height()
     
-    # input box
     input_rect = pygame.Rect(10, 150, w - 200, h)
-    
     paste_btn_rect = pygame.Rect(10, 10, 300, 60)
     done_btn_rect = pygame.Rect(w - 260, 10, 250, 60)
 
@@ -106,13 +95,21 @@ def start_load_window(win, use_pyperclip=True):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if paste_btn_rect.collidepoint(event.pos):
                     text_to_paste = ""
-                    
-                    # Folosim pyperclip (pentru Mac)
-                    try:
-                        text_to_paste = pyperclip.paste()
-                        print("Used pyperclip")
-                    except Exception as e:
-                        print(f"Error pyperclip: {e}")
+                    if use_pyperclip:
+                        try:
+                            text_to_paste = pyperclip.paste()
+                        except Exception as e:
+                            print(f"Error pyperclip: {e}")
+                    else:
+                        try:
+                            content = pygame.scrap.get(pygame.SCRAP_TEXT)
+                            if content:
+                                if isinstance(content, bytes):
+                                    text_to_paste = content.decode("utf-8", errors="ignore")
+                                else:
+                                    text_to_paste = str(content)
+                        except Exception as e:
+                            print(f"Error pygame.scrap: {e}")
                     
                     if text_to_paste:
                         textinput.value += text_to_paste
@@ -134,14 +131,17 @@ def parse_and_load_matrix(matrix_text, width):
         return None, None, None, None, "Load operation cancelled."
     lines = matrix_text.strip().split('\n')
     rows = len(lines)
-    if not (10 <= rows <= 60):
-        return None, None, None, None, "Invalid matrix."
+    
+    # --- FIX 1: Mărit limita la 100 pentru "The Judge" ---
+    if not (10 <= rows <= 100): 
+        return None, None, None, None, f"Invalid matrix size ({rows}). Must be between 10 and 100."
+    # --- SFÂRȘIT FIX ---
+    
     parsed_matrix = []
     start_count = 0
     end_count = 0
     for r, line in enumerate(lines):
         cleaned_line = line.strip()
-        # regex to match only 0,1,2,3 separated by spaces
         if not re.fullmatch(r"^[0-3](\s[0-3])*$", cleaned_line):
             if cleaned_line == "":
                  return None, None, None, None, f"Empty line found in matrix."
@@ -149,7 +149,6 @@ def parse_and_load_matrix(matrix_text, width):
         cols = cleaned_line.split(' ')
         if len(cols) != rows:
             return None, None, None, None, "Matrix is not square."
-        # we get the number of starts and ends on each row
         start_count += cols.count('2')
         end_count += cols.count('3')
         parsed_matrix.append(cols)

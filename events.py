@@ -61,10 +61,10 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
     decrease_button = next(b for b in buttons if b.text == "-")
     increase_button = next(b for b in buttons if b.text == "+")
     
-    # --- MODIFICARE: Două butoane de Load ---
+    presets_button = next(b for b in buttons if b.text == "Presets")
+    
     load_mac_button = next(b for b in buttons if b.text == "Load (Mac)")
     load_win_button = next(b for b in buttons if b.text == "Load (Win)")
-    # --- SFÂRȘIT MODIFICARE ---
     
     save_matrix_button = next(b for b in buttons if b.text == "Save")
     bfs_button = next(b for b in buttons if b.text == "BFS")
@@ -105,6 +105,10 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                 if isinstance(button, ImageButton) and button.is_clicked(event):
                     texture_manager.set_active_texture_index(button.category, button.index)
                     break 
+
+        if presets_button.is_clicked(event):
+            drawing_mode = "choose_preset"
+            break
 
         if find_path_button.is_clicked(event) or (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
             if start_node and end_node and algorithm_generator["running"] == False:
@@ -160,15 +164,13 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
             pyperclip.copy(matrix_str)
             print("Matrix copied to clipboard!") 
 
-        # --- MODIFICARE: Logica pentru cele două butoane ---
         if load_mac_button.is_clicked(event):
-            drawing_mode = "get_matrix_mac" # Semnal pentru main.py să folosească pyperclip
+            drawing_mode = "get_matrix_mac" 
             break 
 
         if load_win_button.is_clicked(event):
-            drawing_mode = "get_matrix_win" # Semnal pentru main.py să folosească scrap
+            drawing_mode = "get_matrix_win" 
             break
-        # --- SFÂRȘIT MODIFICARE ---
         
         if bfs_button.is_clicked(event):
             current_algorithm = "bfs"
@@ -201,15 +203,23 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                 current_time = pygame.time.get_ticks()
                 time_held = current_time - first_pressed_time
                 update_speed_value = max(70, 250 - (time_held / 10))
+                
                 if current_time - last_update > update_speed_value:
                     if decrease_button.is_clicked(event):
+                        # --- FIX: Limite corecte pentru 60x60 (ROWS=62) ---
                         if ROWS > 12:
-                            ROWS -= 1
+                            if ROWS > 62: # Dacă e The Judge (102), sărim la 62
+                                ROWS = 62
+                            else:
+                                ROWS -= 1
                             grid_changed = True
+                        
                     elif increase_button.is_clicked(event):
-                        if ROWS < 62:
+                        if ROWS < 62: # Limităm manualul la 62 (pentru 60x60 usable)
                             ROWS += 1
                             grid_changed = True
+                        # --- SFÂRȘIT FIX ---
+                        
                     last_update = current_time
                 
                 if grid_changed and ROWS != initial_rows:
@@ -235,7 +245,8 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                 break 
 
 
-        if pygame.mouse.get_pressed()[0] or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+        # handle our drawing and erasing on the map
+        if drawing_mode != "just_loaded" and (pygame.mouse.get_pressed()[0] or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
             pos = pygame.mouse.get_pos()
             row, col = get_clicked_pos(pos, ROWS, width)
             if row is not None:
@@ -248,8 +259,6 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                 if not clicked_on_button:
                     spot = grid[row][col]
                     
-                    if drawing_mode == "just_loaded":
-                        drawing_mode = "maker"
                     if drawing_mode == "maker":
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if not start_node and not spot.is_end:
@@ -268,6 +277,11 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                         is_border_wall = row == 0 or row == ROWS - 1 or col == 0 or col == ROWS - 1
                         if spot.is_wall == True and not is_border_wall:
                             spot.reset()
+        
+        # Dacă utilizatorul a ridicat click-ul și eram în modul 'just_loaded',
+        # acum e sigur să trecem în 'maker'.
+        if drawing_mode == "just_loaded" and event.type == pygame.MOUSEBUTTONUP:
+             drawing_mode = "maker"
 
 
         if pygame.mouse.get_pressed()[2]:

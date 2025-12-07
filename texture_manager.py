@@ -25,7 +25,6 @@ class TextureManager:
         """
         
         # 1. Harta pentru IMAGINI (doar primele 2 seturi)
-        # Am șters al treilea element din fiecare listă
         self.texture_filename_map = {
             'wall': ['wall_garden.png', 'wall_2.png'],
             'start': ['start_1.png', 'start_2.png'],
@@ -44,7 +43,7 @@ class TextureManager:
             'path': (155, 89, 182),        # Amethyst (Distinct)
             'search': (46, 204, 113),      # Emerald Green (Active)
             'margin_of_search': (26, 188, 156), # Turquoise (Visited)
-            'background': (255, 225, 150)  # Warm Cream (Relaxing Yellow-White)
+            'background': (253, 225, 150)  # Warm Cream
         }
         
         self.original_textures = {}
@@ -56,7 +55,12 @@ class TextureManager:
         # Încărcăm imaginile și generăm culorile
         for category in TEXTURE_CATEGORIES:
             self.original_textures[category] = []
-            self.active_texture_index[category] = 0
+            
+            # --- MODIFICARE: Setăm default la 2 (Culori/Flat Theme) ---
+            # Index 0 = Imagine 1, Index 1 = Imagine 2, Index 2 = Culori
+            self.active_texture_index[category] = 2 
+            # --- SFÂRȘIT MODIFICARE ---
+            
             self.scaled_textures[category] = []
             
             # Pasul A: Încărcăm imaginile (Index 0 și 1)
@@ -73,14 +77,9 @@ class TextureManager:
                     print(f"AVERTISMENT: Textura lipsă! Nu am găsit: {path}")
             
             # Pasul B: Generăm "Imaginea" de culoare (Index 2)
-            # Creăm o suprafață de bază de 60x60 pe care o vom folosi ca "imagine originală"
             if category in self.color_theme_map:
                 color_surface = pygame.Surface((60, 60))
                 color_surface.fill(self.color_theme_map[category])
-                
-                # Opțional: Adăugăm un mic chenar pentru a arăta mai bine
-                # pygame.draw.rect(color_surface, (0,0,0), (0,0,60,60), 1) 
-                
                 self.original_textures[category].append(color_surface)
 
         print("Managerul de texturi a încărcat imaginile și a generat culorile.")
@@ -92,7 +91,6 @@ class TextureManager:
         la mărimea 'gap' și le stochează în self.scaled_textures.
         """
         self.scaled_textures = {}
-        # Asigurăm o dimensiune minimă de 1px
         safe_gap = max(1, gap)
         new_size = (safe_gap, safe_gap)
         
@@ -100,7 +98,6 @@ class TextureManager:
             scaled_images = []
             for img in images:
                 try:
-                    # Scalarea funcționează la fel și pentru imagini și pentru suprafețele colorate
                     scaled_img = pygame.transform.scale(img, new_size)
                     scaled_images.append(scaled_img)
                 except Exception as e:
@@ -110,7 +107,6 @@ class TextureManager:
     def get_active_texture(self, category):
         """
         Returnează textura activă (și scalată) pentru o categorie dată.
-        (Nicio modificare aici)
         """
         if category not in self.scaled_textures:
             print(f"EROARE: Categoria '{category}' nu a fost găsită în texturile scalate.")
@@ -135,7 +131,6 @@ class TextureManager:
     def set_active_texture_index(self, category, index):
         """
         Setează indexul activ (0, 1, sau 2) pentru o categorie.
-        (Nicio modificare aici)
         """
         if category in self.active_texture_index:
             if 0 <= index < len(self.original_textures[category]):
@@ -148,8 +143,6 @@ class TextureManager:
     def get_original_texture(self, category, index):
         """
         Returnează o textură originală (nescalată) după categorie și index.
-        Util pentru a afișa miniaturi pe butoane.
-        (Nicio modificare aici)
         """
         try:
             return self.original_textures[category][index]
