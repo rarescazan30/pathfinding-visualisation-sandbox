@@ -6,7 +6,7 @@ import time
 
 from graphical_interface.constants import *
 from graphical_interface.spot import Spot
-from graphical_interface.button import ImageButton # Importăm ImageButton
+from graphical_interface.button import ImageButton 
 
 from algorithms.bfs import bfs
 from algorithms.dfs import dfs
@@ -14,7 +14,7 @@ from algorithms.best_first_search import greedyBestFirstSearch
 
 from grid import draw, make_grid, get_clicked_pos
 
-last_update = 0  # Global variable to track last update time for continuous increase
+last_update = 0 
 
 def generate_matrix_string(grid):
     matrix = []
@@ -33,8 +33,6 @@ def generate_matrix_string(grid):
     return "\n".join(matrix)
 
 
-# function to add two colors with randomness and constraints
-# we use this to change the color of the path after each run
 def add_colors(color1, color2):
     result = []
     for c1, c2 in zip(color1, color2):
@@ -56,14 +54,18 @@ def add_colors(color1, color2):
 
 
 def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator, race_mode, texture_manager):
-    # unpack buttons for easier access
-    # Găsim butoanele după text, e mai sigur decât despachetarea fixă
+    # Găsim butoanele după text
     find_path_button = next(b for b in buttons if b.text == "Find Path")
     toggle_grid_button = next(b for b in buttons if b.text == "Toggle Grid")
     toggle_mode_button = next(b for b in buttons if "Eraser" in b.text or "Maker" in b.text)
     decrease_button = next(b for b in buttons if b.text == "-")
     increase_button = next(b for b in buttons if b.text == "+")
-    load_matrix_button = next(b for b in buttons if b.text == "Load")
+    
+    # --- MODIFICARE: Două butoane de Load ---
+    load_mac_button = next(b for b in buttons if b.text == "Load (Mac)")
+    load_win_button = next(b for b in buttons if b.text == "Load (Win)")
+    # --- SFÂRȘIT MODIFICARE ---
+    
     save_matrix_button = next(b for b in buttons if b.text == "Save")
     bfs_button = next(b for b in buttons if b.text == "BFS")
     dfs_button = next(b for b in buttons if b.text == "DFS")
@@ -85,43 +87,32 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
     mouse_pos = pygame.mouse.get_pos()
     
     for button in buttons:
-        # --- Modificare Texturi ---
-        # Dacă e un ImageButton, pasăm și indexul activ pentru a-l evidenția
         if isinstance(button, ImageButton):
             active_index = texture_manager.active_texture_index.get(button.category, -1)
             button.check_for_hover(mouse_pos, active_index)
         else:
-        # --- Sfârșit Modificare ---
             button.check_for_hover(mouse_pos)
 
     for event in events:
-        # clear error message on any interaction
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
             error_message = None
 
         if event.type == pygame.QUIT:
             run = False
 
-        # --- Modificare Texturi ---
-        # Verificăm dacă un buton de textură a fost apăsat
         if event.type == pygame.MOUSEBUTTONDOWN:
             for button in buttons:
                 if isinstance(button, ImageButton) and button.is_clicked(event):
                     texture_manager.set_active_texture_index(button.category, button.index)
-                    break # Am găsit butonul, ieșim din bucla de butoane
-        # --- Sfârșit Modificare ---
+                    break 
 
-        # clear former visualization when finding path
         if find_path_button.is_clicked(event) or (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
             if start_node and end_node and algorithm_generator["running"] == False:
                 for row in grid:
                     for spot in row:
                         spot.clear_visualization()
                 
-                # --- Modificare Texturi ---
-                # draw_lambda trebuie să captureze și texture_manager
                 draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager)
-                # --- Sfârșit Modificare ---
                 
                 if current_algorithm == "bfs":
                     algorithm_generator["generator"] = bfs(draw_lambda, grid, start_node, end_node, cur_square_color)
@@ -153,14 +144,14 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
         if race_mode_button.is_clicked(event):
             if race_mode == False:
                 race_mode = True
-                race_mode_button.update_text("Race Mode: ON") # Schimbat textul
-                race_mode_button.base_color = BUTTON_RED # Schimbat culoarea
-                race_mode_button.hovering_color = HOVER_BUTTON_RED # Schimbat culoarea
+                race_mode_button.update_text("Race Mode: ON") 
+                race_mode_button.base_color = BUTTON_RED 
+                race_mode_button.hovering_color = HOVER_BUTTON_RED 
             else:
                 race_mode = False
-                race_mode_button.update_text("Race Mode: OFF") # Schimbat textul
-                race_mode_button.base_color = GREEN # Schimbat culoarea
-                race_mode_button.hovering_color = BLUE # Schimbat culoarea
+                race_mode_button.update_text("Race Mode: OFF") 
+                race_mode_button.base_color = GREEN 
+                race_mode_button.hovering_color = BLUE 
 
 
         if save_matrix_button.is_clicked(event):
@@ -169,10 +160,15 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
             pyperclip.copy(matrix_str)
             print("Matrix copied to clipboard!") 
 
-        if load_matrix_button.is_clicked(event):
-            drawing_mode = "get_matrix"
-            # we don't want to handle other events while loading a new matrix
+        # --- MODIFICARE: Logica pentru cele două butoane ---
+        if load_mac_button.is_clicked(event):
+            drawing_mode = "get_matrix_mac" # Semnal pentru main.py să folosească pyperclip
             break 
+
+        if load_win_button.is_clicked(event):
+            drawing_mode = "get_matrix_win" # Semnal pentru main.py să folosească scrap
+            break
+        # --- SFÂRȘIT MODIFICARE ---
         
         if bfs_button.is_clicked(event):
             current_algorithm = "bfs"
@@ -190,24 +186,20 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
 
         if toggle_grid_button.is_clicked(event) or (event.type == pygame.KEYDOWN and event.key == pygame.K_g):
                 grid_lines_visible = not grid_lines_visible
-                # Nu mai setăm grid_changed = True, nu e nevoie să recreăm grila
                 
-        global last_update  # use global variable to track last update time
+        global last_update  
         
         if decrease_button.is_clicked(event) or increase_button.is_clicked(event):
-            # we stop the algorithm!
             algorithm_generator["running"] = False
             algorithm_generator["generator"] = None
             algorithm_generator["last_step_time"] = 0
             first_pressed_time = pygame.time.get_ticks()
             
-            initial_rows = ROWS # Stocăm valoarea inițială
+            initial_rows = ROWS 
 
-            # we want to decrease/increase WHILE the button is pressed
             while pygame.mouse.get_pressed()[0]:
                 current_time = pygame.time.get_ticks()
                 time_held = current_time - first_pressed_time
-                # for decreasing faster when held down longer
                 update_speed_value = max(70, 250 - (time_held / 10))
                 if current_time - last_update > update_speed_value:
                     if decrease_button.is_clicked(event):
@@ -220,46 +212,33 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                             grid_changed = True
                     last_update = current_time
                 
-                # update visually (grid and number)
-                # Optimizare: redesenăm doar dacă s-a schimbat grila
                 if grid_changed and ROWS != initial_rows:
                     start_node = None
                     end_node = None
-                    grid = make_grid(ROWS, width)  # Update the grid with the new rows value
+                    grid = make_grid(ROWS, width) 
                     
-                    # --- Modificare Texturi ---
-                    # Actualizăm texturile scalate
                     gap = GRID_WIDTH // ROWS
                     texture_manager.update_scaled_textures(gap)
-                    # Pasăm texture_manager la draw
                     draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager)
-                    # --- Sfârșit Modificare ---
                     
-                    initial_rows = ROWS # Actualizăm valoarea pentru comparație
+                    initial_rows = ROWS 
 
-                
-                # allow pygame to process other events, really important to avoid freezing!
                 for e in pygame.event.get():
                     if e.type == pygame.QUIT:
                         pygame.quit()
                         exit()
-                    # Oprim bucla while dacă mouse-ul s-a ridicat
                     if e.type == pygame.MOUSEBUTTONUP:
-                        # Forțăm ieșirea din bucla while pygame.mouse.get_pressed()[0]
-                        # Setând starea mouse-ului ca "neridicată" (hack-ish, dar necesar)
                         pygame.mouse.set_pos(pygame.mouse.get_pos()) 
                         break
-                else: # dacă bucla 'for' nu dă break
-                    continue # continuăm bucla 'while'
-                break # dacă bucla 'for' dă break, ieșim și din 'while'
+                else: 
+                    continue 
+                break 
 
 
-        # handle our drawing and erasing on the map
         if pygame.mouse.get_pressed()[0] or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
             pos = pygame.mouse.get_pos()
             row, col = get_clicked_pos(pos, ROWS, width)
             if row is not None:
-                # Verificăm să nu fi dat clic pe un buton
                 clicked_on_button = False
                 for button in buttons:
                     if button.rect.collidepoint(pos):
@@ -281,7 +260,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                                 end_node.mark_end()
                             elif not spot.is_start and not spot.is_end:
                                 spot.mark_barrier()
-                        elif pygame.mouse.get_pressed()[0]: # for continuous drawing
+                        elif pygame.mouse.get_pressed()[0]: 
                             if not spot.is_start and not spot.is_end:
                                 spot.mark_barrier()
 
@@ -291,7 +270,6 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                             spot.reset()
 
 
-        # you can delete start and end with right click
         if pygame.mouse.get_pressed()[2]:
             pos = pygame.mouse.get_pos()
             row, col = get_clicked_pos(pos, ROWS, width)
@@ -304,7 +282,6 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                     end_node = None
                     spot.reset()
         
-        # with c you reset the map
         if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
             start_node = None
             end_node = None
@@ -313,6 +290,4 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
             algorithm_generator["generator"] = None
             algorithm_generator["last_step_time"] = 0
 
-    # Logica de rulare a algoritmului a fost mutată în main.py
-    
     return run, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm, race_mode
