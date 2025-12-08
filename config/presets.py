@@ -1,10 +1,6 @@
-# Aici stocăm labirinturile predefinite.
-# Folosim """ (triple quotes) pentru a scrie matricea pe mai multe rânduri.
-# Nu-ți face griji de indentare, codul de încărcare o curăță automat.
-
 PRESET_LABYRINTHS = {
+    # Labyrinth templates of size 10  
     10: [
-        # Varianta 1 (Exemplu 10x10)
         """
 0 0 0 0 1 0 0 0 0 0
 0 1 1 0 1 0 1 1 1 0
@@ -17,7 +13,6 @@ PRESET_LABYRINTHS = {
 0 1 0 0 0 0 0 0 1 3
 0 1 1 1 1 1 1 1 1 1
         """,        
-        # Varianta 2 (Poți da paste la alta aici)
         """
 2 0 0 0 0 0 0 0 0 0 
 1 1 1 1 1 1 1 1 1 0
@@ -42,7 +37,7 @@ PRESET_LABYRINTHS = {
 0 1 1 1 0 1 1 1 1 0
 0 0 0 0 0 0 0 0 0 0
         
-        """, # Varianta 3
+        """,
         """
 2 0 1 0 0 0 1 0 0 0
 1 0 1 0 1 0 1 0 1 0
@@ -54,10 +49,9 @@ PRESET_LABYRINTHS = {
 0 0 0 0 0 0 1 0 1 0
 0 1 1 1 1 1 1 0 1 0
 0 0 0 0 0 0 0 0 1 3        
-        """ # Varianta 4
+        """
     ],
-    
-    # Doar copiază modelul de mai sus pentru restul
+    # Labyrinth templates of size 20
     20: ["""
 2 0 0 1 1 0 1 0 1 0 0 1 0 0 0 1 1 0 1 0
 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0
@@ -146,6 +140,7 @@ PRESET_LABYRINTHS = {
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3         
          """],
+    # Labyrinth templates of size 30
     30: ["""
 2 0 0 1 1 1 0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1 0 0 0 0 1 1 1 1
 0 1 0 0 0 0 1 1 0 0 0 0 1 1 0 0 0 0 1 1 0 0 0 0 1 1 0 0 0 0
@@ -274,6 +269,7 @@ PRESET_LABYRINTHS = {
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1         
          """],
+    # Labyrinth templates of size 40
     40: ["""
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 2 1 3 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1 1
@@ -442,6 +438,7 @@ PRESET_LABYRINTHS = {
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0         
          """],
+    # Labyrinth templates of size 50
     50: ["""
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 2 1 0 1 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1
@@ -650,8 +647,7 @@ PRESET_LABYRINTHS = {
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1         
          """],
-    
-    # Exemplu pentru 60x60 (Doar dă paste între ghilimele)
+    # Labyrinth templates of size 60
     60: [
         """
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
@@ -902,6 +898,7 @@ PRESET_LABYRINTHS = {
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0        
         """
     ],
+    # Labyrinth templates of size 100
     100: [
         """
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
