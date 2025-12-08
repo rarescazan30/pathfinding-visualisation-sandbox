@@ -113,7 +113,7 @@ The project relies on `pygame` for rendering, `easygui` for file dialogs(load fo
 
 * **`Presets:`** Redirects the user to a `new window` where a `premade maze` can be chosen.
 
-* **`Load Mac/Win:`** 2 buttons for 2 loading options that we found that one only works on `mac` and another only on `windows`. `Linux` seems to work on both. The user writes or pastes a labyrinth using the `specified text format`.
+* **`Load Mac/Win:`** 2 buttons for 2 loading options that we found. One only works on `mac` and the other only on `windows`. `Linux` seems to work on both. The user writes or pastes a labyrinth using the `specified text format`.
 
 * **`Save:`** Save the maze on the screen on `clipboard` in the `specified text format`.
 
@@ -128,6 +128,14 @@ The grid uses a standard `2D coordinate system` where `(0,0)` is the `top-left` 
 * **Cazan Rares-Stefan**:
     * **`Features Implemented`**:
     * **`Key Challenges`**:
+    * **`Visual Logic`**: `Spot Class` for grid representation, connecting `Backend` algorithm logic with `Frontend` visual updates.
+    * **`System`**: `Save` and `Load for Mac` functionalities implemented
+    * **`Minigame`**: `Race Mode` minigame with a `Timer`, allowing the user to race against the machine
+    * **`Algorithms`**: Depth-First Search (`DFS`), Greedy Best-First Search (`Greedy BFS`), A Star (`A*`)
+    * **`Key Challenges`**:
+    * **`Faulty event handling`**: Multiple errors caused by poor `Event Management` when implementing `Race Mode`.
+    * **`Load conflicts`**: Introduced new `Load` logic with proper macOS support.
+    * **`Visual synchronization`**: Critical issues while implementing user-supported input for `Race Mode`. Added `Yield` to algorithms and adjusted update handling.
 
 * **Chiselita Sebastian**:
   * **`Features Implemented`**:
