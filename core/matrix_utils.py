@@ -3,17 +3,27 @@ import pygame
 import pygame_textinput
 import pygame.scrap 
 import pyperclip    
-
 import easygui
+
 from core.grid import make_grid
 from ui.spot import Spot
 from ui.constants import *
 
-def get_matrix_input_popup():
-    msg = "Paste your matrix (0=path, 1=wall, 2=start, 3=end):"
-    title = "Load Labyrinth Matrix"
-    return easygui.codebox(msg, title, "") 
+# Formats text to fit within the display width by splitting long lines
+# Default pygame textinput doesn't support this
+def wrap_text(s: str) -> str:
+    s = s.replace("\r", "").strip("\x00")
+    wrapped = []
+    for line in s.split("\n"):
+        while len(line) > 90:
+            wrapped.append(line[:90])
+            line = line[90:]
+        wrapped.append(line)
+    return "\n".join(wrapped)
 
+
+
+# Render of custom load window
 def draw_for_load_window(win, text_input_value, input_rect, paste_btn_rect, done_btn_rect, font_object):
     width, height = win.get_width(), win.get_height()
     win.fill(WHITE)
@@ -22,10 +32,8 @@ def draw_for_load_window(win, text_input_value, input_rect, paste_btn_rect, done
     box_x = (width - box_w) // 2
     box_y = (height - box_h) // 2
 
-    # panel first
     pygame.draw.rect(win, GREY, (box_x, box_y, box_w, box_h))
 
-    # input area
     pygame.draw.rect(win, WHITE, input_rect)
 
     wrapped_text = wrap_text(text_input_value)
@@ -39,31 +47,23 @@ def draw_for_load_window(win, text_input_value, input_rect, paste_btn_rect, done
         win.blit(text_surface, (x_pos, y_offset))
         y_offset += font_object.get_linesize() 
 
-
     mouse_pos = pygame.mouse.get_pos()
     color_done = RED if done_btn_rect.collidepoint(mouse_pos) else GREEN
     color_paste = RED if paste_btn_rect.collidepoint(mouse_pos) else GREEN
+    
     pygame.draw.rect(win, color_paste, paste_btn_rect, border_radius=12)
     pygame.draw.rect(win, color_done, done_btn_rect, border_radius=12)
+    
     btn_font = pygame.font.SysFont("Arial", 14, bold=True)
     btn_text = btn_font.render("   Click to paste your matrix!\n(0=path, 1=wall, 2=start, 3=end)", True, WHITE)
     btn_text_done = btn_font.render("Done", True, WHITE)
+    
     win.blit(btn_text, btn_text.get_rect(center=paste_btn_rect.center))
     win.blit(btn_text_done, btn_text_done.get_rect(center=done_btn_rect.center))
 
     pygame.display.update()
 
-
-def wrap_text(s: str) -> str:
-    s = s.replace("\r", "").strip("\x00")
-    wrapped = []
-    for line in s.split("\n"):
-        while len(line) > 90:
-            wrapped.append(line[:90])
-            line = line[90:]
-        wrapped.append(line)
-    return "\n".join(wrapped)
-
+# Runs the custom input window loop for manual data entry or pasting
 def start_load_window(win, use_pyperclip=True):
     if not use_pyperclip:
         pygame.scrap.init()
@@ -95,11 +95,12 @@ def start_load_window(win, use_pyperclip=True):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if paste_btn_rect.collidepoint(event.pos):
                     text_to_paste = ""
+                    # Attempt to paste from clipboard using available method
                     if use_pyperclip:
                         try:
                             text_to_paste = pyperclip.paste()
-                        except Exception as e:
-                            print(f"Error pyperclip: {e}")
+                        except Exception:
+                            pass
                     else:
                         try:
                             content = pygame.scrap.get(pygame.SCRAP_TEXT)
@@ -108,8 +109,8 @@ def start_load_window(win, use_pyperclip=True):
                                     text_to_paste = content.decode("utf-8", errors="ignore")
                                 else:
                                     text_to_paste = str(content)
-                        except Exception as e:
-                            print(f"Error pygame.scrap: {e}")
+                        except Exception:
+                            pass
                     
                     if text_to_paste:
                         textinput.value += text_to_paste
@@ -125,42 +126,54 @@ def start_load_window(win, use_pyperclip=True):
  
     return textinput.value
 
+# Simple wrapper for the EasyGUI text input box
+def get_matrix_input_popup():
+    msg = "Paste your matrix (0=path, 1=wall, 2=start, 3=end):"
+    title = "Load Labyrinth Matrix"
+    return easygui.codebox(msg, title, "") 
 
+# Validates the raw string input and converts it into a Grid object
 def parse_and_load_matrix(matrix_text, width):
+    
     if not matrix_text: 
         return None, None, None, None, "Load operation cancelled."
     lines = matrix_text.strip().split('\n')
     rows = len(lines)
     
-    # --- FIX 1: Mărit limita la 100 pentru "The Judge" ---
     if not (10 <= rows <= 100): 
         return None, None, None, None, f"Invalid matrix size ({rows}). Must be between 10 and 100."
-    # --- SFÂRȘIT FIX ---
     
     parsed_matrix = []
     start_count = 0
     end_count = 0
+    
     for r, line in enumerate(lines):
         cleaned_line = line.strip()
+        
+        # Regex validation: Only allow digits 0-3 separated by spaces
         if not re.fullmatch(r"^[0-3](\s[0-3])*$", cleaned_line):
             if cleaned_line == "":
                  return None, None, None, None, f"Empty line found in matrix."
             return None, None, None, None, f"Invalid characters in row {r+1}."
+        
         cols = cleaned_line.split(' ')
         if len(cols) != rows:
-            print(len(cols), rows)
             return None, None, None, None, "Matrix is not square."
+            
         start_count += cols.count('2')
         end_count += cols.count('3')
         parsed_matrix.append(cols)
+
     if start_count != 1:
         return None, None, None, None, "Matrix must have exactly one start (2)."
     if end_count != 1:
         return None, None, None, None, "Matrix must have exactly one end (3)."
+    
     grid_rows_with_border = rows + 2 
     new_grid = make_grid(grid_rows_with_border, width)
     new_start = None
     new_end = None
+    
     for r in range(rows):
         for c in range(rows):
             spot = new_grid[r + 1][c + 1] 
@@ -173,4 +186,5 @@ def parse_and_load_matrix(matrix_text, width):
             elif val == '3':
                 spot.mark_end()
                 new_end = spot
+                
     return new_grid, grid_rows_with_border, new_start, new_end, None
