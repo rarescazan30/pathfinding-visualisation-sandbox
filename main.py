@@ -23,12 +23,12 @@ def main(win, width):
         pygame.quit()
         return
 
-    current_rows = 40
+    current_rows = 20
     
     currrent_square_colour = RED
     start_node = None
     end_node = None
-    grid_lines_visible = True
+    grid_lines_visible = False
     drawing_mode = "maker"
     error_message = None
     

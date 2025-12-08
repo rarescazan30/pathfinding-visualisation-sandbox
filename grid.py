@@ -31,10 +31,10 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, tex
 
     font = pygame.font.SysFont("Arial", 22)
     usable_size = rows - 2
-    size_text = font.render(f"{usable_size}x{usable_size} Grid", True, BLACK)
+    size_text = font.render(f"{usable_size}x{usable_size}", True, BLACK)
     button_x_right_menu = GRID_X_OFFSET + GRID_WIDTH + 50
-    text_center_x = button_x_right_menu + 100 
-    text_rect = size_text.get_rect(center=(text_center_x, 345)) 
+    text_center_x = button_x_right_menu + 90
+    text_rect = size_text.get_rect(center=(text_center_x, 355)) 
     win.blit(size_text, text_rect)
 
     for row in grid:
