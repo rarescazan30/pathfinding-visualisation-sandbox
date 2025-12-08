@@ -17,7 +17,6 @@ from texture_manager import TextureManager
 from preset_chooser import start_preset_chooser
 
 def main(win, width):
-    
     if not os.path.isdir('assets/textures'):
         print("EROARE: Folderul 'assets/textures' nu a fost găsit.")
         print("Te rog asigură-te că ai 21 de imagini în 'assets/textures'")
@@ -68,15 +67,25 @@ def main(win, width):
     }
     
     show_secret_message = False
-    
+    win_start_time = 0
+    loss_start_time = 0
     clock = pygame.time.Clock() 
     
     while run:
-        draw(
-            win, grid, current_rows, GRID_WIDTH, buttons, 
-            grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button,
-            show_secret_message 
-        )
+        show_win_message = False
+        show_loss_message= False
+        # ca sa nu spameze
+        if win_start_time > 0:
+            if pygame.time.get_ticks() - win_start_time < 2000:
+                show_win_message = True
+            else:
+                win_start_time = 0
+        if loss_start_time > 0:
+            if pygame.time.get_ticks() - loss_start_time < 2000:
+                show_loss_message = True
+            else:
+                loss_start_time = 0
+        
         
         previous_rows = current_rows
 
@@ -86,11 +95,14 @@ def main(win, width):
             run, events, grid, current_rows, start_node, end_node, win, GRID_WIDTH,
             currrent_square_colour, buttons, grid_lines_visible, drawing_mode,
             error_message, current_algorithm, algorithm_generator,
-            texture_manager, race_mode, race_timer
+            texture_manager, race_mode, race_timer, race_timer_button, show_secret_message
         )
         (run, start_node, end_node, currrent_square_colour, 
          grid, grid_lines_visible, drawing_mode, current_rows, 
-         error_message, current_algorithm, race_mode) = result
+         error_message, current_algorithm, race_mode, win_triggered) = result
+        
+        if win_triggered:
+            win_start_time = pygame.time.get_ticks()
         
         if race_mode:
             if race_timer["running"]:
@@ -111,12 +123,28 @@ def main(win, width):
             try:
                 next(algorithm_generator["generator"])
             except StopIteration:
-                algorithm_generator["running"] = False
-                algorithm_generator["generator"] = None
                 if race_mode and race_timer["running"]:
+                    print("USER LOST! Algorithm finished first.")
                     race_timer["running"] = False
+                    race_mode = False
+                    loss_start_time = pygame.time.get_ticks()
+                    show_loss_message = True
+                    
+                    # Update the button visually to OFF
+                    # We look for the button in the list to update it
+                    for btn in buttons:
+                        if "Race Mode" in btn.text:
+                            btn.update_text("Race Mode: OFF")
+                            btn.base_color = GREEN
+                            btn.hovering_color = BLUE
+                            break
             algorithm_generator["last_step_time"] = current_ticks
 
+        draw(
+            win, grid, current_rows, GRID_WIDTH, buttons, 
+            grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button,
+            show_secret_message, race_timer["running"], show_win_message, show_loss_message
+        )
 
         if drawing_mode == "choose_preset":
             result = start_preset_chooser(win)

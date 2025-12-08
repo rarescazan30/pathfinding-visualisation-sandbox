@@ -280,7 +280,7 @@ def create_buttons(button_font, small_font, texture_manager):
             except IndexError:
                 print(f"Nu s-a putut crea butonul pentru {category}_{i+1}")
                 
-        current_y += y_gap # Trecem la următorul rând de texturi
+        current_y_tex += y_gap
 
     timer_x = RIGHT_MENU_START_X + 10
     timer_y = 650

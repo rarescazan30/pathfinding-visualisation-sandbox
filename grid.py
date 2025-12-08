@@ -13,7 +13,7 @@ def draw_race_timer(win, elapsed_ms):
     rect = text_surface.get_rect(center=(x, y))
     win.blit(text_surface, rect)
 
-def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button, show_secret_message):
+def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button, show_secret_message, race_started=False, show_win_message=False, show_loss_message=False):
     # Am adăugat texture_manager ca parametru
     
     win.fill(WHITE)
@@ -70,14 +70,78 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, tex
         button.draw(win)
     if race_mode:
         race_timer_button.draw(win)
+    
+
+
+    if show_win_message:
+        # Stylish Box for Victory
+        font = pygame.font.SysFont("Verdana", 50, bold=True)
+        text = font.render("YOU WON!", True, WHITE)
+        
+        text_rect = text.get_rect(center=(GRID_X_OFFSET + GRID_WIDTH // 2, GRID_Y_OFFSET + GRID_HEIGHT // 2))
+        bg_rect = text_rect.inflate(80, 50)
+        
+        # Shadow
+        shadow_rect = bg_rect.copy()
+        shadow_rect.move_ip(5, 5)
+        pygame.draw.rect(win, (50, 50, 50), shadow_rect, border_radius=20)
+        
+        # Green Background for Victory
+        pygame.draw.rect(win, GREEN, bg_rect, border_radius=20)
+        
+        # Gold Border
+        pygame.draw.rect(win, YELLOW, bg_rect, 6, border_radius=20)
+        
+        win.blit(text, text_rect)
+    
+    if show_loss_message:
+        font = pygame.font.SysFont("Verdana", 50, bold=True)
+        text = font.render("YOU LOST!", True, WHITE)
+        
+        text_rect = text.get_rect(center=(GRID_X_OFFSET + GRID_WIDTH // 2, GRID_Y_OFFSET + GRID_HEIGHT // 2))
+        bg_rect = text_rect.inflate(80, 50)
+        
+        # Shadow
+        shadow_rect = bg_rect.copy()
+        shadow_rect.move_ip(5, 5)
+        pygame.draw.rect(win, (50, 50, 50), shadow_rect, border_radius=20)
+        
+        # Red Background
+        pygame.draw.rect(win, BUTTON_RED, bg_rect, border_radius=20)
+        
+        # Darker Border (Not Gold)
+        pygame.draw.rect(win, (150, 50, 50), bg_rect, 6, border_radius=20)
+        
+        win.blit(text, text_rect)  
+
+    if race_mode and not race_started:
+        # Use a larger, bolder font
+        font = pygame.font.SysFont("Verdana", 30, bold=True)
+        text = font.render("Click on the grid to Start Race!", True, WHITE)
+        
+        # Center the text
+        text_rect = text.get_rect(center=(GRID_X_OFFSET + GRID_WIDTH // 2, GRID_Y_OFFSET + GRID_HEIGHT // 2))
+        
+        # Define the background box with padding
+        bg_rect = text_rect.inflate(60, 40)
+        
+        
+        # Draw Main Box Background (Dark Teal)
+        pygame.draw.rect(win, BLACK, bg_rect, border_radius=15)
+        
+        # Draw Text
+        win.blit(text, text_rect)
+    
     # draw the error message
     if error_message:
         error_font = pygame.font.SysFont("Arial", 20, bold=True)
         error_surface = error_font.render(error_message, True, BUTTON_RED)
         error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, TOTAL_HEIGHT - 30))
         win.blit(error_surface, error_rect)
+        
 
     pygame.display.update()
+
 
 
 def make_grid(rows, width):

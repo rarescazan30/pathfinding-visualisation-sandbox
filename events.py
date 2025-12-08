@@ -3,6 +3,7 @@ import random
 import pyperclip
 import re
 import time
+from collections import deque
 
 from graphical_interface.constants import *
 from graphical_interface.spot import Spot
@@ -32,6 +33,42 @@ def generate_matrix_string(grid):
         matrix.append(" ".join(row_str))
     return "\n".join(matrix)
 
+def check_user_victory(grid, start_node, end_node):
+    """
+    Performs a quick BFS to see if the User Path connects Start to End.
+    Allows DIAGONAL connections.
+    """
+    if not start_node or not end_node:
+        return False
+
+    queue = deque([start_node])
+    visited = {start_node}
+
+    while queue:
+        current = queue.popleft()
+        
+        # Check all 8 neighbors (Orthogonal + Diagonal)
+        directions = [
+            (0, 1), (0, -1), (1, 0), (-1, 0),
+            (1, 1), (1, -1), (-1, 1), (-1, -1)
+        ]
+
+        for dr, dc in directions:
+            r, c = current.row + dr, current.col + dc
+            
+            if 0 <= r < len(grid) and 0 <= c < len(grid[0]):
+                neighbor = grid[r][c]
+                
+                # Victory Condition
+                if neighbor == end_node:
+                    return True
+                
+                # Traverse User Paths
+                if neighbor.is_user_path and neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append(neighbor)
+    
+    return False
 
 def add_colors(color1, color2):
     result = []
@@ -53,9 +90,10 @@ def add_colors(color1, color2):
 
 
 
-def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator, texture_manager, race_mode, race_timer):
+def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator, texture_manager, race_mode, race_timer, race_timer_button, show_secret_message):
     # unpack buttons for easier access
     # Găsim butoanele după text, e mai sigur decât despachetarea fixă
+    win_triggered = False
     find_path_button = next(b for b in buttons if b.text == "Find Path")
     toggle_grid_button = next(b for b in buttons if b.text == "Toggle Grid")
     toggle_mode_button = next(b for b in buttons if "Eraser" in b.text or "Maker" in b.text)
@@ -119,7 +157,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                 
                 # --- Modificare Texturi ---
                 # draw_lambda trebuie să captureze și texture_manager
-                draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer)
+                draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer, race_timer_button, show_secret_message)
                 # --- Sfârșit Modificare ---
                 
                 if current_algorithm == "bfs":
@@ -236,7 +274,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                     gap = GRID_WIDTH // ROWS
                     texture_manager.update_scaled_textures(gap)
                     # Pasăm texture_manager la draw
-                    draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager, race_timer)
+                    draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager, race_timer, race_timer_button, show_secret_message)
                     # --- Sfârșit Modificare ---
                     
                     initial_rows = ROWS 
@@ -265,10 +303,32 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                         break
                 
                 if not clicked_on_button:
-                    if race_mode and not race_timer["running"]:
+                    if race_mode and not race_timer["running"] and event.type == pygame.MOUSEBUTTONDOWN:
                         race_timer["running"] = True
                         race_timer["start_time"] = pygame.time.get_ticks()
-                        race_timer["elapsed_ms"] = 0
+                        # race_timer["elapsed_ms"] = 0
+                        
+                        # Trigger Algorithm Automatically
+                        if start_node and end_node and algorithm_generator["running"] == False:
+                            for r in grid:
+                                for s in r:
+                                    s.clear_visualization()
+                            
+                            # Define lambda with new 'race_started=True'
+                            draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button, show_secret_message, True)
+                            
+                            if current_algorithm == "bfs":
+                                algorithm_generator["generator"] = bfs(draw_lambda, grid, start_node, end_node, cur_square_color)
+                            elif current_algorithm == "dfs":
+                                algorithm_generator["generator"] = dfs(draw_lambda, grid, start_node, end_node, cur_square_color)
+                            elif current_algorithm == "gbfs":
+                                algorithm_generator["generator"] = greedyBestFirstSearch(draw_lambda, grid, start_node, end_node, cur_square_color)
+                            
+                            algorithm_generator["running"] = True
+                            algorithm_generator["last_step_time"] = pygame.time.get_ticks()
+                            cur_square_color = add_colors(cur_square_color, (10, 10, 10))
+                    
+                    
                     spot = grid[row][col]
                     
                     if drawing_mode == "maker":
@@ -280,11 +340,47 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                                 end_node = spot
                                 end_node.mark_end()
                             elif not spot.is_start and not spot.is_end:
-                                spot.mark_barrier()
+                                # --- DRAWING LOGIC (Click) ---
+                                if race_mode:
+                                    if not spot.is_wall:
+                                        spot.mark_user_path()
+                                        # Victory Check
+                                        if check_user_victory(grid, start_node, end_node):
+                                            print("USER WINS! (Click)")
+                                            race_timer["running"] = False
+                                            algorithm_generator["running"] = False
+                                            
+                                            race_mode = False
+                                            win_triggered = True
+                                            
+                                            race_mode_button.update_text("Race Mode: OFF")
+                                            race_mode_button.base_color = GREEN
+                                            race_mode_button.hovering_color = BLUE
+                                else:
+                                    spot.mark_barrier()
+                                # -----------------------------
+
                         elif pygame.mouse.get_pressed()[0]: 
                             if not spot.is_start and not spot.is_end:
-                                spot.mark_barrier()
+                                if race_mode:
+                                    if not spot.is_wall:
+                                        spot.mark_user_path()
 
+                                        if race_timer["running"] and check_user_victory(grid, start_node, end_node):
+                                            print("USER WINS! (Drag)")
+                                            race_timer["running"] = False
+                                            algorithm_generator["running"] = False
+                                            
+                                            
+                                            race_mode = False
+                                            win_triggered = True
+                                            
+                                            
+                                            race_mode_button.update_text("Race Mode: OFF")
+                                            race_mode_button.base_color = GREEN
+                                            race_mode_button.hovering_color = BLUE
+                                else:
+                                    spot.mark_barrier()
                     elif drawing_mode == "eraser":
                         is_border_wall = row == 0 or row == ROWS - 1 or col == 0 or col == ROWS - 1
                         if spot.is_wall == True and not is_border_wall:
@@ -328,4 +424,4 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
 
     # Logica de rulare a algoritmului a fost mutată în main.py
     
-    return run, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm, race_mode
+    return run, start_node, end_node, cur_square_color, grid, grid_lines_visible, drawing_mode, ROWS, error_message, current_algorithm, race_mode, win_triggered

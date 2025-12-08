@@ -14,6 +14,7 @@ class Spot:
         self.is_start = False
         self.is_end = False
         self.is_wall = False
+        self.is_user_path = False # for race mode!
         self.is_visited = False # Folosim asta pentru 'margin_of_search'
         self.parent = None
 
@@ -41,6 +42,7 @@ class Spot:
             self.colour = WHITE
             self.parent = None
             self.is_visited = False
+            self.is_user_path = False
 
     def mark_start(self):
         self.colour = ORANGE
@@ -48,10 +50,14 @@ class Spot:
         self.is_wall = False
 
     def mark_closed(self, colour):
+        if self.is_user_path:
+            return
         self.colour = colour
         self.is_visited = True
 
     def mark_open(self):
+        if self.is_user_path:
+            return
         self.colour = GREEN
 
     def mark_barrier(self):
@@ -67,6 +73,15 @@ class Spot:
         self.colour = PURPLE
         self.is_visited = True # O cale este și vizitată
         
+    def mark_user_path(self):
+        # Only used when USER draws in Race Mode
+        if self.is_start or self.is_end:
+            return
+        self.colour = PURPLE
+        self.is_user_path = True
+        self.is_wall = False
+        self.is_visited = True
+    
     def reset(self):
         self.colour = WHITE
         self.is_visited = False
@@ -74,6 +89,7 @@ class Spot:
         self.is_wall = False
         self.is_end = False
         self.is_start = False
+        self.is_user_path = False
 
     def draw(self, win, padding_x, padding_y, texture_manager):
         # Am adăugat texture_manager ca parametru
