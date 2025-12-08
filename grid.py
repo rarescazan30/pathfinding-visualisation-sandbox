@@ -13,48 +13,36 @@ def draw_race_timer(win, elapsed_ms):
     rect = text_surface.get_rect(center=(x, y))
     win.blit(text_surface, rect)
 
-def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button):
+def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button, show_secret_message):
     # Am adăugat texture_manager ca parametru
     
-    # Fundalul general (poate fi o textură de fundal în viitor)
     win.fill(WHITE)
 
     # draw side menus
     pygame.draw.rect(win, GREY, (0, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
     pygame.draw.rect(win, GREY, (GRID_X_OFFSET + GRID_WIDTH, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
 
-    # grid frame (nu grila în sine, ci chenarul ei)
+    # grid frame
     pygame.draw.rect(win, BLACK, (GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT))
 
-    # padding for variable size of grid
     gap = width // rows
     actual_grid_size = gap * rows
     padding = (width - actual_grid_size) // 2
 
-    # draw the grid size text
     font = pygame.font.SysFont("Arial", 22)
     usable_size = rows - 2
     size_text = font.render(f"{usable_size}x{usable_size} Grid", True, BLACK)
     button_x_right_menu = GRID_X_OFFSET + GRID_WIDTH + 50
-    text_center_x = button_x_right_menu + 100 # Centrul e OK
-    # --- MODIFICARE: Am ajustat poziția Y ---
-    # Mutat la 345 (era 350) pentru a se centra în noul spațiu
+    text_center_x = button_x_right_menu + 100 
     text_rect = size_text.get_rect(center=(text_center_x, 345)) 
-    # --- SFÂRȘIT MODIFICARE ---
     win.blit(size_text, text_rect)
 
-    # --- Modificare Texturi ---
-    # Desenăm texturile
     for row in grid:
         for spot in row:
-            # Pasăm managerul la funcția 'draw' a fiecărui spot
             spot.draw(win, padding, padding, texture_manager)
-    # --- Sfârșit Modificare ---
-
 
     if grid_lines_visible:
         for i in range(rows + 1):
-            # horizontal and vertical lines
             pygame.draw.line(
                 win, BLACK, (GRID_X_OFFSET + padding, GRID_Y_OFFSET + padding + i * gap),
                 (GRID_X_OFFSET + padding + actual_grid_size, GRID_Y_OFFSET + padding + i * gap))
@@ -62,7 +50,22 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, tex
                 win, BLACK, (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding),
                   (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding + actual_grid_size))
     
-    # draw the ui buttons
+    # --- FIX 2: Înlocuit emoji cu asteriscuri ---
+    if show_secret_message:
+        msg_font = pygame.font.SysFont("Arial", 20, bold=True)
+        # Am șters emoji-urile ⭐ și am pus *
+        msg_text = msg_font.render("* If you like our project please give us a star! *", True, (255, 215, 0)) 
+        
+        msg_bg_surface = pygame.Surface((GRID_WIDTH, 40))
+        msg_bg_surface.set_alpha(180) 
+        msg_bg_surface.fill((0, 0, 0))
+        
+        win.blit(msg_bg_surface, (GRID_X_OFFSET, GRID_Y_OFFSET)) 
+        
+        text_rect = msg_text.get_rect(center=(GRID_X_OFFSET + GRID_WIDTH // 2, GRID_Y_OFFSET + 20))
+        win.blit(msg_text, text_rect)
+    # --- SFÂRȘIT FIX ---
+
     for button in buttons:
         button.draw(win)
     if race_mode:
@@ -71,7 +74,6 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, tex
     if error_message:
         error_font = pygame.font.SysFont("Arial", 20, bold=True)
         error_surface = error_font.render(error_message, True, BUTTON_RED)
-        # L-am mutat mai jos pentru a nu se suprapune cu butoanele noi
         error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, TOTAL_HEIGHT - 30))
         win.blit(error_surface, error_rect)
 
@@ -85,7 +87,6 @@ def make_grid(rows, width):
         grid.append([])
         for j in range(rows):
             spot = Spot(i, j, gap, rows)
-            # Acum, pereții de margine vor folosi și ei textura 'wall'
             if i == 0 or i == rows - 1 or j == 0 or j == rows - 1:
                 spot.mark_barrier()
             grid[i].append(spot)
@@ -97,7 +98,6 @@ def get_clicked_pos(pos, rows, width):
     padding = (width - actual_grid_size) // 2
     
     x, y = pos
-    # account for padding
     relative_x = x - GRID_X_OFFSET - padding
     relative_y = y - GRID_Y_OFFSET - padding
     

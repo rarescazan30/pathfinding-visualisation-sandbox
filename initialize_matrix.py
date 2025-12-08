@@ -1,71 +1,20 @@
 import re
 import pygame
 import pygame_textinput
-import pygame.scrap
+import pygame.scrap 
+import pyperclip    
 
 import easygui
 from grid import make_grid
 from graphical_interface.spot import Spot
 from graphical_interface.constants import *
 
+def get_matrix_input_popup():
+    msg = "Paste your matrix (0=path, 1=wall, 2=start, 3=end):"
+    title = "Load Labyrinth Matrix"
+    return easygui.codebox(msg, title, "") 
 
-""""
-
-def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message):
-    win.fill(WHITE)
-
-    # draw side menus
-    pygame.draw.rect(win, GREY, (0, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
-    pygame.draw.rect(win, GREY, (GRID_X_OFFSET + GRID_WIDTH, 0, SIDE_MENU_WIDTH, TOTAL_HEIGHT))
-
-    # grid frame
-    pygame.draw.rect(win, BLACK, (GRID_X_OFFSET, GRID_Y_OFFSET, GRID_WIDTH, GRID_HEIGHT))
-
-    # padding for variable size of grid
-    gap = width // rows
-    actual_grid_size = gap * rows
-    padding = (width - actual_grid_size) // 2
-
-    # draw the grid size text
-    font = pygame.font.SysFont("Arial", 22)
-    usable_size = rows - 2
-    size_text = font.render(f"{usable_size}x{usable_size} Grid", True, BLACK)
-    button_x_right_menu = GRID_X_OFFSET + GRID_WIDTH + 50
-    text_center_x = button_x_right_menu + 100
-    text_rect = size_text.get_rect(center=(text_center_x, 350))
-    win.blit(size_text, text_rect)
-
-    for row in grid:
-        for spot in row:
-            spot.draw(win, padding, padding)
-
-
-    if grid_lines_visible:
-        for i in range(rows + 1):
-            # horizontal and vertical lines
-            pygame.draw.line(
-                win, BLACK, (GRID_X_OFFSET + padding, GRID_Y_OFFSET + padding + i * gap),
-                (GRID_X_OFFSET + padding + actual_grid_size, GRID_Y_OFFSET + padding + i * gap))
-            pygame.draw.line(
-                win, BLACK, (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding),
-                  (GRID_X_OFFSET + padding + i * gap, GRID_Y_OFFSET + padding + actual_grid_size))
-    
-    # draw the ui buttons
-    for button in buttons:
-        button.draw(win)
-
-    # draw the error message
-    if error_message:
-        error_font = pygame.font.SysFont("Arial", 18, bold=True)
-        error_surface = error_font.render(error_message, True, (200, 0, 0))
-        error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, 480))
-        win.blit(error_surface, error_rect)
-
-    pygame.display.update()
-
-
-"""
-def draw_for_load_window(win, text_surface, input_rect, paste_btn_rect, done_btn_rect):
+def draw_for_load_window(win, text_input_value, input_rect, paste_btn_rect, done_btn_rect, font_object):
     width, height = win.get_width(), win.get_height()
     win.fill(WHITE)
 
@@ -76,12 +25,19 @@ def draw_for_load_window(win, text_surface, input_rect, paste_btn_rect, done_btn
     # panel first
     pygame.draw.rect(win, GREY, (box_x, box_y, box_w, box_h))
 
-    # input area and its text
+    # input area
     pygame.draw.rect(win, WHITE, input_rect)
-    win.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
 
+    wrapped_text = wrap_text(text_input_value)
     
-
+    lines = wrapped_text.split('\n')
+    y_offset = input_rect.y + 5
+    x_pos = input_rect.x + 5
+    
+    for line in lines:
+        text_surface = font_object.render(line, True, BLACK)
+        win.blit(text_surface, (x_pos, y_offset))
+        y_offset += font_object.get_linesize() 
 
 
     mouse_pos = pygame.mouse.get_pos()
@@ -98,7 +54,6 @@ def draw_for_load_window(win, text_surface, input_rect, paste_btn_rect, done_btn
     pygame.display.update()
 
 
-# we want to see the text nicely displayed on our page
 def wrap_text(s: str) -> str:
     s = s.replace("\r", "").strip("\x00")
     wrapped = []
@@ -109,63 +64,66 @@ def wrap_text(s: str) -> str:
         wrapped.append(line)
     return "\n".join(wrapped)
 
-def start_load_window(win):
-    # clipboard
-    pygame.scrap.init()
+def start_load_window(win, use_pyperclip=True):
+    if not use_pyperclip:
+        pygame.scrap.init()
     
     textinput = pygame_textinput.TextInputVisualizer(font_color=BLACK, cursor_color=BLACK)
     
     w, h = win.get_width(), win.get_height()
-    box_center_x = w // 2
-    box_center_y = h // 2
     
-    # input box
     input_rect = pygame.Rect(10, 150, w - 200, h)
-    
     paste_btn_rect = pygame.Rect(10, 10, 300, 60)
-
     done_btn_rect = pygame.Rect(w - 260, 10, 250, 60)
 
     run_load = True
 
-    return_textvalue = ""
     while run_load:
         events = pygame.event.get()
         textinput.update(events)
-        return_textvalue = textinput.value
         
-        draw_for_load_window(win, textinput.surface, input_rect, paste_btn_rect, done_btn_rect)
+        draw_for_load_window(
+            win, textinput.value, input_rect, 
+            paste_btn_rect, done_btn_rect, 
+            textinput.font_object
+        )
 
         for event in events:
             if event.type == pygame.QUIT:
-                return return_textvalue
-            
+                return textinput.value
             
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if paste_btn_rect.collidepoint(event.pos):
-                    # we get clipboard content
-                    content = pygame.scrap.get(pygame.SCRAP_TEXT)
-                    if content:
-                        if isinstance(content, bytes):
-                            text = content.decode("utf-8", errors="ignore")
-                        else:
-                            text = str(content)
-                        # we want to show the text in the input box so we wrap
-                        textinput.value += text
-                        return_textvalue = content
-                        # textinput.value = wrap_text(textinput.value)
+                    text_to_paste = ""
+                    if use_pyperclip:
+                        try:
+                            text_to_paste = pyperclip.paste()
+                        except Exception as e:
+                            print(f"Error pyperclip: {e}")
+                    else:
+                        try:
+                            content = pygame.scrap.get(pygame.SCRAP_TEXT)
+                            if content:
+                                if isinstance(content, bytes):
+                                    text_to_paste = content.decode("utf-8", errors="ignore")
+                                else:
+                                    text_to_paste = str(content)
+                        except Exception as e:
+                            print(f"Error pygame.scrap: {e}")
+                    
+                    if text_to_paste:
+                        textinput.value += text_to_paste
 
                 if done_btn_rect.collidepoint(event.pos):
-                    return return_textvalue
+                    return textinput.value
                     
-
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return return_textvalue
+                    return textinput.value
                 if event.key == pygame.K_RETURN:
-                    return return_textvalue
-  
-    return return_textvalue
+                    return textinput.value
+ 
+    return textinput.value
 
 
 def parse_and_load_matrix(matrix_text, width):
@@ -173,15 +131,17 @@ def parse_and_load_matrix(matrix_text, width):
         return None, None, None, None, "Load operation cancelled."
     lines = matrix_text.strip().split('\n')
     rows = len(lines)
-    if not (10 <= rows <= 60):
-        print(rows)
-        return None, None, None, None, "Invalid matrix."
+    
+    # --- FIX 1: Mărit limita la 100 pentru "The Judge" ---
+    if not (10 <= rows <= 100): 
+        return None, None, None, None, f"Invalid matrix size ({rows}). Must be between 10 and 100."
+    # --- SFÂRȘIT FIX ---
+    
     parsed_matrix = []
     start_count = 0
     end_count = 0
     for r, line in enumerate(lines):
         cleaned_line = line.strip()
-        # regex to match only 0,1,2,3 separated by spaces
         if not re.fullmatch(r"^[0-3](\s[0-3])*$", cleaned_line):
             if cleaned_line == "":
                  return None, None, None, None, f"Empty line found in matrix."
@@ -190,7 +150,6 @@ def parse_and_load_matrix(matrix_text, width):
         if len(cols) != rows:
             print(len(cols), rows)
             return None, None, None, None, "Matrix is not square."
-        # we get the number of starts and ends on each row
         start_count += cols.count('2')
         end_count += cols.count('3')
         parsed_matrix.append(cols)
