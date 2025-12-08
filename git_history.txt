@@ -1,52 +1,66 @@
-* bdbe225 (HEAD -> sebi, origin/sebi) fix(eraser tool): eraser tool deletes walls only
-* 7c8e785 (origin/main, origin/branch-rares, origin/HEAD, main, branch-rares) chore: minor clarity change
-* d82b5ae chore: minor clairty changes
-* f75e9c5 chore: minor clairty changes
-* 4ae25f9 feat: implemented hold to increase/decrease grid size. made minor structure changes for cleaner code. testing on linux needs to be done with events.py change at line 200
-* 6cc5a57 fix: imported spot
-* e8fd241 fix: included grid import in new file initialize_matrix
-*   932bca7 chore: pulled and fixed conflicts with origin/branch-rares
+* 80369c2 - 2025-12-08 - Final version implemented [sebastian.chiselita]
+* a305db8 - 2025-12-08 - fix: minor readme fix + added own contributions [Rares Cazan]
+* 4c64436 - 2025-12-08 - chore: cleanup and useful comments added to code [Rares Cazan]
+* ce271d8 - 2025-12-08 - Update README cu credits si descriere [sebastian.chiselita]
+* 2b42532 - 2025-12-08 - Added comments for algorithms [sebastian.chiselita]
+* a3f9ce1 - 2025-12-08 - fix: redid folder structure to be clean [Rares Cazan]
+* 951fde6 - 2025-12-08 - fix: algorithms run faster for better visualisation [Rares Cazan]
+* 2dbcf1b - 2025-12-08 - Written a complete version of README [sebastian.chiselita]
+* 397ae5a - 2025-12-08 - fix: visual changes [Rares Cazan]
+* cea472f - 2025-12-08 - feat!: added A* support, fix: visual glitches. ready to merge [Rares Cazan]
+* 44a1533 - 2025-12-08 - feat: race mode almost done. need to show loss message. need to fix small bugs like: race mode message showing when increasing/decreasing grid size need to refactor code because it's not modularised [Rares Cazan]
+*   4859b6f - 2025-12-08 - Rebase remote-tracking branch 'origin/main' into branch-rares [Rares Cazan]
 |\  
-| * 4d07bad feat(algorithm): Added best_first_search algorithm
-| * 69c70ea feat(algorithm): added and implemented  dfs.py in algorithms
-| * c2ef9c3 fix(eraser tool): eraser tool deletes walls only
-| *   7e73260 Merge branch 'sebi'
+| * 0d39689 - 2025-12-08 - feat(presets): implement predefined labyrinth system and 'The Judge' fix(ui): set default theme to flat colors [sebastian.chiselita]
+| * 8116b52 - 2025-12-07 - feat(ui): rethought texture feature with textures with different themes and a color option fix(core): add dual load buttons for cross-platform compatibility (Win/Mac) [sebastian.chiselita]
+* | a0f1ee7 - 2025-12-08 - feat: basic timer implementation [Rares Cazan]
+* | c286726 - 2025-12-08 - Added .DS_Store to gitignore [Rares Cazan]
+* | a33f7fa - 2025-11-19 - fix: matrix loading problems fixed [Rares Cazan]
+|/  
+* 40c0209 - 2025-11-19 - feat!(textures): Implemented 3 textures for every kind of tile [sebastian.chiselita]
+* 30459e0 - 2025-11-01 - fix(eraser tool): eraser tool deletes walls only [Rares Cazan]
+* 58d6422 - 2025-11-18 - fix: handled manual inputs in load labyrinth correctly [Rares Cazan]
+* 520baff - 2025-11-18 - fix: corrected small logical issue [Rares Cazan]
+* e2a5356 - 2025-11-18 - feat!: implemented new interface for pasting matrix (easyguy uncompatible with mac)        added race mode button, to add race mode        added feature to enable user to add walls *while* algorithm is running        made minor visual changes        users can clear board or remove grid while algorithm is running [Rares Cazan]
+* 582b761 - 2025-11-17 - feat!: user can draw while algorithm is working. multiple bugs - grid toggle glitch, algorithm change bug [Rares Cazan]
+* 7c8e785 - 2025-11-16 - chore: minor clarity change [Rares Cazan]
+* d82b5ae - 2025-11-16 - chore: minor clairty changes [Rares Cazan]
+* f75e9c5 - 2025-11-16 - chore: minor clairty changes [Rares Cazan]
+* 4ae25f9 - 2025-11-16 - feat: implemented hold to increase/decrease grid size. made minor structure changes for cleaner code. testing on linux needs to be done with events.py change at line 200 [Rares Cazan]
+* 6cc5a57 - 2025-11-16 - fix: imported spot [Rares Cazan]
+* e8fd241 - 2025-11-16 - fix: included grid import in new file initialize_matrix [Rares Cazan]
+*   932bca7 - 2025-11-16 - chore: pulled and fixed conflicts with origin/branch-rares [Rares Cazan]
+|\  
+| * 4d07bad - 2025-11-01 - feat(algorithm): Added best_first_search algorithm [Rares Cazan]
+| * 69c70ea - 2025-11-01 - feat(algorithm): added and implemented  dfs.py in algorithms [Rares Cazan]
+| * c2ef9c3 - 2025-11-01 - fix(eraser tool): eraser tool deletes walls only [Rares Cazan]
+| *   7e73260 - 2025-10-29 - Merge branch 'sebi' [sebastian.chiselita]
 | |\  
-| * | 690fe6f Minor update to test contributor visibility
-* | | fffe125 chore: made separate initialize_matrix file for cleaner code
-* | | c52646d fix: Made a better way to choose algorithms & error message for matrix loading
-* | | 7a84319 feat!(menu): Implement "Load/Save Labyrinth" feature and fix critical bugs
-* | | 6b525ae feat(algorithm): Added best_first_search algorithm
-* | | 0939ce2 feat(algorithm): added and implemented  dfs.py in algorithms
-* | | a2435ed fix(eraser tool): eraser tool deletes walls only
-* | | 4211f61 Minor update to test contributor visibility
+| * | 690fe6f - 2025-10-27 - Minor update to test contributor visibility [sebastian.chiselita]
+* | | fffe125 - 2025-11-16 - chore: made separate initialize_matrix file for cleaner code [Rares Cazan]
+* | | c52646d - 2025-11-02 - fix: Made a better way to choose algorithms & error message for matrix loading [sebastian.chiselita]
+* | | 7a84319 - 2025-11-01 - feat!(menu): Implement "Load/Save Labyrinth" feature and fix critical bugs [sebastian.chiselita]
+* | | 6b525ae - 2025-11-01 - feat(algorithm): Added best_first_search algorithm [Rares Cazan]
+* | | 0939ce2 - 2025-11-01 - feat(algorithm): added and implemented  dfs.py in algorithms [Rares Cazan]
+* | | a2435ed - 2025-11-01 - fix(eraser tool): eraser tool deletes walls only [Rares Cazan]
+* | | 4211f61 - 2025-10-27 - Minor update to test contributor visibility [sebastian.chiselita]
 | |/  
 |/|   
-| | * 6a97544 (refs/stash) On sebi: temp
-| |/| 
-|/| | 
-| | * 42a6418 index on sebi: b00e896 Implemented adjustable grid size with dynamic centering
-| |/  
-|/|   
-* | b00e896 Implemented adjustable grid size with dynamic centering
+* | b00e896 - 2025-10-29 - Implemented adjustable grid size with dynamic centering [sebastian.chiselita]
 |/  
-* 5d34875 Implemented UI menu, grid toggle, eraser
-| * 8d4f48f (origin/test_branch, test_branch) Experimental: Added start/end textures, outer barrier and barrier textures. Made it so barrier has both texture and colour. Made shared.py to share visited colour with barrier colour for visual effect
-| * 8b90d3c Changed display.update -> display.flip (better)
-|/  
-* ca4623f Modularised code. Implement color change for each run
-* c1a714f Beta pathfinding BFS 1.0
-* 7671a7a Fixed drag click
-* 55cb549 Changes bfs algorithm
-* 6163ff0 Mixed contributions to a working program
-*   83ae4c5 Rebased with origin. Changed directory to graphical interface
+* 5d34875 - 2025-10-27 - Implemented UI menu, grid toggle, eraser [sebastian.chiselita]
+* ca4623f - 2025-10-25 - Modularised code. Implement color change for each run [Rares Cazan]
+* c1a714f - 2025-10-23 - Beta pathfinding BFS 1.0 [Rares Cazan]
+* 7671a7a - 2025-10-23 - Fixed drag click [Rares Cazan]
+* 55cb549 - 2025-10-23 - Changes bfs algorithm [sebastian.chiselita]
+* 6163ff0 - 2025-10-23 - Mixed contributions to a working program [sebastian.chiselita]
+*   83ae4c5 - 2025-10-23 - Rebased with origin. Changed directory to graphical interface [Rares Cazan]
 |\  
-| * 7f6827d Changed main.py to print matrix
-| * 2b6a408 Implemented grid structure logic
-* | 206aa2e Implemented spot.py + backend compatibility.
-* | 2e3ff61 Renamed main.py -> graphical_interface. Made new directory. Added basic display window for game
+| * 7f6827d - 2025-10-23 - Changed main.py to print matrix [sebastian.chiselita]
+| * 2b6a408 - 2025-10-23 - Implemented grid structure logic [sebastian.chiselita]
+* | 206aa2e - 2025-10-23 - Implemented spot.py + backend compatibility. [Rares Cazan]
+* | 2e3ff61 - 2025-10-23 - Renamed main.py -> graphical_interface. Made new directory. Added basic display window for game [Rares Cazan]
 |/  
-* 541c427 Added libraries in main.py
-* 586c43c Added main.py
-* aee1066 Initial commit
-* 12acec6 (origin/master) Initial commit
+* 541c427 - 2025-10-23 - Added libraries in main.py [Rares Cazan]
+* 586c43c - 2025-10-23 - Added main.py [Rares Cazan]
+* aee1066 - 2025-10-23 - Initial commit [rarescazan30]

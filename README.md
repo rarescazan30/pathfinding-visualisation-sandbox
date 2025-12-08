@@ -90,9 +90,9 @@ To run the project, a `Python virtual environment` is recommended to manage depe
 
 
 `Step 2:` Install Dependencies
-The project relies on `pygame` for rendering, `easygui` for file dialogs(load for windows), and `pyperclip` for clipboard operations:
+The project relies on `pygame` for rendering, `easygui` for file dialogs(load for windows), `pyperclip` and `pygame-textinput` for clipboard operations:
 
-`pip install pygame easygui pyperclip`
+`pip install pygame easygui pyperclip pygame-textinput`
 
 `Step 3:` Run the Application
 
