@@ -8,8 +8,6 @@ def reconstruct_path(came_from, current, draw):
     while current in came_from:
         current = came_from[current]
         current.mark_path()
-        # draw()
-        time.sleep(0.02)
 
 def dfs(draw, grid, start_node, finish_node, visited_colour):
     stack = [start_node] # we use stack like this instead of recursion
@@ -40,7 +38,6 @@ def dfs(draw, grid, start_node, finish_node, visited_colour):
                     # visual indication that this node is being considered
                     if neighbor != finish_node:
                         neighbor.mark_open()
-                        time.sleep(0.02) # small delay for visualization
         # draw() 
         yield True # yield control back to the main loop
     return False

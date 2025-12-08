@@ -55,7 +55,7 @@ def main(win, width):
     algorithm_generator = {
             "generator": None,
             "running": False,
-            "step_interval_ms": 25,
+            "step_interval_ms": 2,
             "last_step_time": 0,
         }
     run = True

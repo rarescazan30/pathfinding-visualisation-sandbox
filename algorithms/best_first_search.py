@@ -11,7 +11,6 @@ def reconstruct_path(came_from, current, draw):
         current = came_from[current]
         current.mark_path()
         # draw()
-        #time.sleep(0.02)
 
 
 
@@ -53,8 +52,6 @@ def greedyBestFirstSearch(draw, grid, start, goal, visited_colour):
                     # visual indication that this node is being considered
                     if neighbor != goal:
                         neighbor.mark_open()
-        time.sleep(0.01) # helps with visualisation
-        # draw()
 
         yield True # yield control back to the main loop
 
