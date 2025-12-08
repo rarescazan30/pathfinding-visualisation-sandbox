@@ -12,7 +12,7 @@ from events import handle_events
 from grid import draw, get_clicked_pos, make_grid
 # --- MODIFICARE ---
 # Am adăugat 'create_buttons' la import
-from graphical_interface.button import Button, ImageButton, create_buttons
+from graphical_interface.button import Button, ImageButton, RaceTimerButton, create_buttons
 # --- SFÂRȘIT MODIFICARE ---
 from graphical_interface.spot import Spot
 from graphical_interface.constants import *
@@ -57,7 +57,7 @@ def main(win, width):
     # 4. Pasăm managerul de texturi la funcția de creare a butoanelor
     # --- MODIFICARE ---
     # Am eliminat 'Button.' din apel
-    buttons = create_buttons(button_font, small_font, texture_manager)
+    buttons, race_timer_button = create_buttons(button_font, small_font, texture_manager)
     # --- SFÂRȘIT MODIFICARE ---
     # --- Sfârșitul modificărilor pentru texturi ---
 
@@ -69,6 +69,11 @@ def main(win, width):
         }
     run = True
     race_mode = False
+    race_timer = {
+        "running": False,
+        "start_time": 0,
+        "elapsed_ms": 0
+    }
     
     clock = pygame.time.Clock() # Adăugăm un ceas pentru a controla FPS-ul
     
@@ -76,23 +81,34 @@ def main(win, width):
         # Pasăm și managerul de texturi funcției 'draw'
         draw(
             win, grid, current_rows, GRID_WIDTH, buttons, 
-            grid_lines_visible, error_message, texture_manager
+            grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button
         )
         
         events = pygame.event.get()
         
-        # Pasăm managerul de texturi și la 'handle_events'
+
+        
+
         result = handle_events(
             run, events, grid, current_rows, start_node, end_node, win, GRID_WIDTH,
             currrent_square_colour, buttons, grid_lines_visible, drawing_mode,
-            error_message, current_algorithm, algorithm_generator, race_mode,
-            texture_manager # Adăugat
+            error_message, current_algorithm, algorithm_generator,
+            texture_manager, race_mode, race_timer
         )
         # unpack all returned values
         (run, start_node, end_node, currrent_square_colour, 
          grid, grid_lines_visible, drawing_mode, current_rows, 
          error_message, current_algorithm, race_mode) = result
         
+        if race_mode:
+            if race_timer["running"]:
+                # Calculate time (Use 'start_time' to match your initialization)
+                race_timer["elapsed_ms"] = pygame.time.get_ticks() - race_timer["start_time"]
+                # Update the button visual text
+                race_timer_button.update_time(race_timer["elapsed_ms"])
+            else:
+                # Reset to 0.0s if race is ON but hasn't started yet
+                race_timer["elapsed_ms"] = 0
 
         # Logica pentru rularea algoritmului (mutată din events.py pentru claritate)
         current_ticks = pygame.time.get_ticks()
@@ -104,6 +120,8 @@ def main(win, width):
             except StopIteration:
                 algorithm_generator["running"] = False
                 algorithm_generator["generator"] = None
+                if race_mode and race_timer["running"]:
+                    race_timer["running"] = False
             algorithm_generator["last_step_time"] = current_ticks
 
 

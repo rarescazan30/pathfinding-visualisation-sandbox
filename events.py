@@ -55,7 +55,7 @@ def add_colors(color1, color2):
 
 
 
-def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator, race_mode, texture_manager):
+def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator, texture_manager, race_mode, race_timer):
     # unpack buttons for easier access
     # Găsim butoanele după text, e mai sigur decât despachetarea fixă
     find_path_button = next(b for b in buttons if b.text == "Find Path")
@@ -120,7 +120,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                 
                 # --- Modificare Texturi ---
                 # draw_lambda trebuie să captureze și texture_manager
-                draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager)
+                draw_lambda = lambda: draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer)
                 # --- Sfârșit Modificare ---
                 
                 if current_algorithm == "bfs":
@@ -132,7 +132,6 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                 
                 algorithm_generator["running"] = True
                 algorithm_generator["last_step_time"] = pygame.time.get_ticks()
-                
                 cur_square_color = add_colors(cur_square_color, (10, 10, 10))
                 pygame.event.clear(pygame.KEYDOWN) 
 
@@ -153,14 +152,17 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
         if race_mode_button.is_clicked(event):
             if race_mode == False:
                 race_mode = True
-                race_mode_button.update_text("Race Mode: ON") # Schimbat textul
-                race_mode_button.base_color = BUTTON_RED # Schimbat culoarea
-                race_mode_button.hovering_color = HOVER_BUTTON_RED # Schimbat culoarea
+                race_mode_button.update_text("Race Mode: ON")
+                race_mode_button.base_color = BUTTON_RED
+                race_mode_button.hovering_color = HOVER_BUTTON_RED
+                race_timer["start_time"] = pygame.time.get_ticks()
             else:
                 race_mode = False
-                race_mode_button.update_text("Race Mode: OFF") # Schimbat textul
-                race_mode_button.base_color = GREEN # Schimbat culoarea
-                race_mode_button.hovering_color = BLUE # Schimbat culoarea
+                race_mode_button.update_text("Race Mode: OFF")
+                race_mode_button.base_color = GREEN
+                race_mode_button.hovering_color = BLUE
+                race_timer["running"] = False
+                race_timer["elapsed_ms"] = 0
 
 
         if save_matrix_button.is_clicked(event):
@@ -232,7 +234,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                     gap = GRID_WIDTH // ROWS
                     texture_manager.update_scaled_textures(gap)
                     # Pasăm texture_manager la draw
-                    draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager)
+                    draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager, race_timer)
                     # --- Sfârșit Modificare ---
                     
                     initial_rows = ROWS # Actualizăm valoarea pentru comparație
@@ -267,6 +269,10 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                         break
                 
                 if not clicked_on_button:
+                    if race_mode and not race_timer["running"]:
+                        race_timer["running"] = True
+                        race_timer["start_time"] = pygame.time.get_ticks()
+                        race_timer["elapsed_ms"] = 0
                     spot = grid[row][col]
                     
                     if drawing_mode == "just_loaded":
@@ -305,6 +311,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                     spot.reset()
         
         # with c you reset the map
+
         if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
             start_node = None
             end_node = None
@@ -312,6 +319,14 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
             algorithm_generator["running"] = False
             algorithm_generator["generator"] = None
             algorithm_generator["last_step_time"] = 0
+            
+                    
+                
+
+            if race_mode:
+                race_timer["running"] = False
+                race_timer["elapsed_ms"] = 0
+                race_timer["start_time"] = pygame.time.get_ticks()
 
     # Logica de rulare a algoritmului a fost mutată în main.py
     

@@ -3,7 +3,17 @@ from graphical_interface.spot import Spot
 from graphical_interface.constants import *
 
 
-def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, texture_manager):
+def draw_race_timer(win, elapsed_ms):
+    font = pygame.font.SysFont("Arial", 28, bold=True)
+    seconds = elapsed_ms // 1000
+    millis = (elapsed_ms % 1000) // 10
+    text_surface = font.render(f"Time: {seconds}.{millis:02}s", True, BLACK)
+    x = GRID_X_OFFSET + GRID_WIDTH + (SIDE_MENU_WIDTH // 2)
+    y = 120  # under the Race Mode button
+    rect = text_surface.get_rect(center=(x, y))
+    win.blit(text_surface, rect)
+
+def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button):
     # Am adăugat texture_manager ca parametru
     
     # Fundalul general (poate fi o textură de fundal în viitor)
@@ -55,7 +65,8 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, tex
     # draw the ui buttons
     for button in buttons:
         button.draw(win)
-
+    if race_mode:
+        race_timer_button.draw(win)
     # draw the error message
     if error_message:
         error_font = pygame.font.SysFont("Arial", 20, bold=True)

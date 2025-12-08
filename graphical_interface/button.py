@@ -90,6 +90,35 @@ class ImageButton(Button):
 
 # --- SFÂRȘIT CLASĂ NOUĂ ---
 
+class RaceTimerButton(Button):
+    def __init__(self, x, y, width, height):
+        # We don't need hover colors for the timer, so we use GREY for both
+        super().__init__(x, y, width, height, "", None, base_color=GREY, hovering_color=GREY)
+        self.text = "Time: 0.0s"
+        self.text_color = BLACK
+        # Standard timer font
+        self.font = pygame.font.SysFont("Arial", 28, bold=True)
+        # Store x, y, width, height explicitly if needed for custom draw logic
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+    def update_time(self, elapsed_ms: int):
+        seconds = elapsed_ms // 1000
+        # Calculate tenths of a second
+        tenths = (elapsed_ms % 1000) // 100
+        self.text = f"Time: {seconds}.{tenths}s"
+
+    def draw(self, win):
+        # Draw background
+        # pygame.draw.rect(win, self.base_color, self.rect, border_radius=6) # Optional background
+        
+        # Render text
+        label_surface = self.font.render(self.text, True, self.text_color)
+        # Center the text in the button area
+        label_rect = label_surface.get_rect(center=self.rect.center)
+        win.blit(label_surface, label_rect)
 
 # --- MODIFICARE ---
 # Am scos '@staticmethod' și am de-indentat funcția.
@@ -278,15 +307,12 @@ def create_buttons(button_font, small_font, texture_manager):
                 
         current_y += y_gap # Trecem la următorul rând de texturi
 
-    # 2. Butoanele de Acțiune (mutate mai jos)
-    # --- MODIFICARE: Am șters butoanele de acțiune de aici ---
-    # action_btn_width = 200
-    # ...
-    # all_buttons.extend([
-    #     load_matrix_button, save_matrix_button,
-    #     bfs_button, dfs_button, gbfs_button
-    # ])
-    # --- SFÂRȘIT MODIFICARE ---
+    timer_x = RIGHT_MENU_START_X + 10
+    timer_y = 650
+    timer_width = RIGHT_MENU_WIDTH - 20
+    timer_height = 40
+    
+    race_timer_button = RaceTimerButton(timer_x, timer_y, timer_width, timer_height)
 
-    return all_buttons
+    return all_buttons, race_timer_button
 # --- SFÂRȘIT MODIFICARE ---
