@@ -113,7 +113,7 @@ The project relies on `pygame` for rendering, `easygui` for file dialogs(load fo
 
 * **`Presets:`** Redirects the user to a `new window` where a `premade maze` can be chosen.
 
-* **`Load Mac/Win:`** 2 buttons for 2 loading options that we found that one only works on `mac` and another only on `windows`. `Linux` seems to work on both. The user writes or pastes a labyrinth using the `specified text format`.
+* **`Load Mac/Win:`** 2 buttons for 2 loading options that we found. One only works on `mac` and the other only on `windows`. `Linux` seems to work on both. The user writes or pastes a labyrinth using the `specified text format`.
 
 * **`Save:`** Save the maze on the screen on `clipboard` in the `specified text format`.
 
@@ -125,6 +125,27 @@ The project relies on `pygame` for rendering, `easygui` for file dialogs(load fo
 The grid uses a standard `2D coordinate system` where `(0,0)` is the `top-left` corner. The algorithms interact with the `Spot` objects using `(row, col)` indices.
 
 ## 4) Credits:
-**`Cazan Rares-Stefan & Chiselita Sebastian:`** Core implementation, architecture, algorithms, and logic.
+* **Cazan Rares-Stefan**:
+    * **`Features Implemented`**:
+    * **`Visual Logic`**: `Spot Class` for grid representation, connecting `Backend` algorithm logic with `Frontend` visual updates.
+    * **`System`**: `Save` and `Load for Mac` functionalities implemented
+    * **`Minigame`**: `Race Mode` minigame with a `Timer`, allowing the user to race against the machine
+    * **`Algorithms`**: Depth-First Search (`DFS`), Greedy Best-First Search (`Greedy BFS`), A Star (`A*`)
+    * **`Key Challenges`**:
+    * **`Faulty event handling`**: Multiple errors caused by poor `Event Management` when implementing `Race Mode`.
+    * **`Load conflicts`**: Introduced new `Load` logic with proper macOS support.
+    * **`Visual synchronization`**: Critical issues while implementing user-supported input for `Race Mode`. Added `Yield` to algorithms and adjusted update handling.
 
-**`Duminica Andra-Sara-Maria:`** Created the images used in assets/ for texture creation.
+* **Chiselita Sebastian**:
+  * **`Features Implemented`**:
+    * **`Grid Tools`**: `Eraser` tool, `Grid lines` rendering, and `Toggle Grid` button.
+    * **`Visual Logic`**: `Texture/Color` mapping for tiles, `Grid sizing`, and `Dynamic centralization`.
+    * **`System`**: `Save` and `Load for Windows/Linux` functionalities and the `Presets` engine (logic & `pre-defined` maps).
+    * **`Algorithms`**: Breadth-First Search (`BFS`).
+  * **`Key Challenges`**:
+    * **`GUI Conflicts`**: Critical crashes caused by the interaction between `easygui` file dialogs and the main `pygame` event loop.
+    * **`State Synchronization`**: Fixed logic errors where the Eraser tool would remove visual elements without updating the backend grid state (`visual vs. functional desync`).
+    * **`Dynamic Layout`**: Solved rendering alignment issues to ensure the maze remains perfectly `centered` regardless of the grid size selection.
+
+* **`Duminica Andra-Sara-Maria`**:
+  * Created the images used in assets/ for texture creation.
