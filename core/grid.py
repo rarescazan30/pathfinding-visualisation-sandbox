@@ -180,9 +180,10 @@ def draw(win, grid, rows, width, buttons, grid_lines_visible, error_message, tex
         draw_race_start_prompt(win)
     
     if error_message:
-        error_font = pygame.font.SysFont("Arial", 20, bold=True)
-        error_surface = error_font.render(error_message, True, BUTTON_RED)
-        error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH // 2, TOTAL_HEIGHT - 30))
+        error_font = pygame.font.SysFont("Arial", 30, bold=True)
+        color = GREEN if "clipboard" in error_message else BUTTON_RED
+        error_surface = error_font.render(error_message, True, color)
+        error_rect = error_surface.get_rect(center=(SIDE_MENU_WIDTH + 360, TOTAL_HEIGHT - 30))
         win.blit(error_surface, error_rect)
         
     pygame.display.update()

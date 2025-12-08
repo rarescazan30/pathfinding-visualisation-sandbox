@@ -19,11 +19,11 @@ def draw_preset_window(win, buttons, back_button):
     win.fill(WHITE)
 
     title_font = pygame.font.SysFont("Arial", 30, bold=True)
-    title_text = title_font.render("Alege un Labirint Predefinit", True, BLACK)
+    title_text = title_font.render("Choose a premade labyrinth", True, BLACK)
     win.blit(title_text, title_text.get_rect(center=(TOTAL_WIDTH // 2, 50)))
 
     instr_font = pygame.font.SysFont("Arial", 18)
-    instr_text = instr_font.render("Selectează o dimensiune și o variantă:", True, GREY)
+    instr_text = instr_font.render("Select an option", True, GREY)
     win.blit(instr_text, instr_text.get_rect(center=(TOTAL_WIDTH // 2, 90)))
 
     for btn in buttons:
