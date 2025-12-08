@@ -149,6 +149,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
             button.check_for_hover(mouse_pos)
 
     for event in events:
+        # Reset error message on interaction (except Save button)
         if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN:
             error_message = None
 
@@ -218,6 +219,8 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
             internal_grid = [row[1:-1] for row in grid[1:-1]]
             matrix_str = generate_matrix_string(internal_grid)
             pyperclip.copy(matrix_str)
+            # We set the message here so it appears on screen
+            error_message = "Map copied to clipboard!"
 
         if ui["load_mac"].is_clicked(event):
             drawing_mode = "get_matrix_mac" 

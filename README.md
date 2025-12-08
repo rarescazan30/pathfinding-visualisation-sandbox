@@ -62,7 +62,19 @@ The graphical interface components are located in the `ui` package:
 
 ## 3) Important Implementation Details:
 
-### 3.1) Installation and Setup:
+### 3.1) Link to Github project:
+https://github.com/rarescazan30/pathfinding-visualisation-sandbox
+
+### 3.2) Languages & Technologies:
+
+* **Programming Language**: Python 3.12.3
+* **Graphics Engine**: `pygame` (Surface rendering, Event loop, Sprite management)
+* **GUI Components**:
+  * `easygui`: For native OS file dialogs (Load/Save windows).
+  * Custom UI elements (Buttons, Windows) built from scratch using Pygame.
+* **System Integration**: `pyperclip` (For clipboard operations).
+
+### 3.3) Installation and Setup:
 
 To run the project, a `Python virtual environment` is recommended to manage dependencies.
 
@@ -86,8 +98,7 @@ The project relies on `pygame` for rendering, `easygui` for file dialogs(load fo
 
 `python main.py`
 
-
-### 3.2) Controls and Interaction:
+### 3.4) Controls and Interaction:
 
 #### The Mouse and Keyboard controls:
 
@@ -120,19 +131,18 @@ The project relies on `pygame` for rendering, `easygui` for file dialogs(load fo
 * **`BFS/DFS/GBFS/A*:`** Buttons for choosing the `current algorithm`.
 
 
-### 3.3) Coordinate System:
+### 3.5) Coordinate System:
 
 The grid uses a standard `2D coordinate system` where `(0,0)` is the `top-left` corner. The algorithms interact with the `Spot` objects using `(row, col)` indices.
 
 ## 4) Credits:
 * **Cazan Rares-Stefan**:
-    * **`Features Implemented`**:
-    * **`Key Challenges`**:
+  * **`Features Implemented`**:
     * **`Visual Logic`**: `Spot Class` for grid representation, connecting `Backend` algorithm logic with `Frontend` visual updates.
     * **`System`**: `Save` and `Load for Mac` functionalities implemented
     * **`Minigame`**: `Race Mode` minigame with a `Timer`, allowing the user to race against the machine
     * **`Algorithms`**: Depth-First Search (`DFS`), Greedy Best-First Search (`Greedy BFS`), A Star (`A*`)
-    * **`Key Challenges`**:
+  * **`Key Challenges`**:
     * **`Faulty event handling`**: Multiple errors caused by poor `Event Management` when implementing `Race Mode`.
     * **`Load conflicts`**: Introduced new `Load` logic with proper macOS support.
     * **`Visual synchronization`**: Critical issues while implementing user-supported input for `Race Mode`. Added `Yield` to algorithms and adjusted update handling.

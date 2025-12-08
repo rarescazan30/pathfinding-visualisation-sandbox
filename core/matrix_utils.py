@@ -141,7 +141,7 @@ def parse_and_load_matrix(matrix_text, width):
     rows = len(lines)
     
     if not (10 <= rows <= 100): 
-        return None, None, None, None, f"Invalid matrix size ({rows}). Must be between 10 and 100."
+        return None, None, None, None, f"Invalid matrix size ({rows}). Must be between 10 and 60."
     
     parsed_matrix = []
     start_count = 0
