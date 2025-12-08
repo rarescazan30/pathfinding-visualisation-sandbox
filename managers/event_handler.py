@@ -5,16 +5,16 @@ import re
 import time
 from collections import deque
 
-from graphical_interface.constants import *
-from graphical_interface.spot import Spot
-from graphical_interface.button import ImageButton 
+from ui.constants import *
+from ui.spot import Spot
+from ui.button import ImageButton 
 
 from algorithms.bfs import bfs
 from algorithms.dfs import dfs
 from algorithms.best_first_search import greedyBestFirstSearch
 from algorithms.astar import astar
 
-from grid import draw, make_grid, get_clicked_pos
+from core.grid import draw, make_grid, get_clicked_pos
 
 last_update = 0 
 

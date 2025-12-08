@@ -1,6 +1,6 @@
 import pygame
-from graphical_interface.constants import *
-from texture_manager import TEXTURE_NAMES, TEXTURE_CATEGORIES
+from ui.constants import *
+from managers.texture_manager import TEXTURE_NAMES, TEXTURE_CATEGORIES
 
 class Button:
     def __init__(self, x, y, width, height, text, font, base_color, hovering_color):

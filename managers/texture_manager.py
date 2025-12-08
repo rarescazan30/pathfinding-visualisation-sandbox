@@ -1,6 +1,6 @@
 import pygame
 import os
-from graphical_interface.constants import *
+from ui.constants import *
 
 # Definim categoriile pe baza folderului tău de assets
 TEXTURE_CATEGORIES = [

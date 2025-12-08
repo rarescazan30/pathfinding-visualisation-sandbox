@@ -1,6 +1,6 @@
 import pygame
-from graphical_interface.spot import Spot
-from graphical_interface.constants import *
+from ui.spot import Spot
+from ui.constants import *
 
 
 def draw_race_timer(win, elapsed_ms):

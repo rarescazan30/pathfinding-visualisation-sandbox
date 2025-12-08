@@ -1,5 +1,5 @@
 import time
-from graphical_interface.spot import Spot
+from ui.spot import Spot
 
 def reconstruct_path(came_from, current, draw):
     # same as BFS

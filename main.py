@@ -7,14 +7,14 @@ import pygame
 from algorithms.bfs import bfs
 from algorithms.dfs import dfs
 from algorithms.best_first_search import greedyBestFirstSearch
-from events import handle_events
-from grid import draw, get_clicked_pos, make_grid
-from graphical_interface.button import Button, ImageButton, RaceTimerButton, create_buttons
-from graphical_interface.spot import Spot
-from graphical_interface.constants import *
-from initialize_matrix import parse_and_load_matrix, start_load_window, get_matrix_input_popup
-from texture_manager import TextureManager 
-from preset_chooser import start_preset_chooser
+from managers.event_handler import handle_events
+from core.grid import draw, get_clicked_pos, make_grid
+from ui.button import Button, ImageButton, RaceTimerButton, create_buttons
+from ui.spot import Spot
+from ui.constants import *
+from core.matrix_utils import parse_and_load_matrix, start_load_window, get_matrix_input_popup
+from managers.texture_manager import TextureManager 
+from ui.preset_chooser import start_preset_chooser
 
 def main(win, width):
     if not os.path.isdir('assets/textures'):

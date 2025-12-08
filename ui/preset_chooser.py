@@ -1,7 +1,7 @@
 import pygame
-from graphical_interface.constants import *
-from graphical_interface.button import Button
-from presets import PRESET_LABYRINTHS
+from ui.constants import *
+from ui.button import Button
+from config.presets import PRESET_LABYRINTHS
 
 # --- MODIFICARE: Mapare Nume ---
 PRESET_CONFIG = {

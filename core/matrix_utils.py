@@ -5,9 +5,9 @@ import pygame.scrap
 import pyperclip    
 
 import easygui
-from grid import make_grid
-from graphical_interface.spot import Spot
-from graphical_interface.constants import *
+from core.grid import make_grid
+from ui.spot import Spot
+from ui.constants import *
 
 def get_matrix_input_popup():
     msg = "Paste your matrix (0=path, 1=wall, 2=start, 3=end):"

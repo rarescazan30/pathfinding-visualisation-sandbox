@@ -1,5 +1,5 @@
 import heapq
-from graphical_interface.spot import Spot
+from ui.spot import Spot
 
 def heuristic(p1, p2):
     # We use Manhattan distance because we can only move up/down/left/right
