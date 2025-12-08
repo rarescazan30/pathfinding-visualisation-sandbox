@@ -12,6 +12,7 @@ from graphical_interface.button import ImageButton
 from algorithms.bfs import bfs
 from algorithms.dfs import dfs
 from algorithms.best_first_search import greedyBestFirstSearch
+from algorithms.astar import astar
 
 from grid import draw, make_grid, get_clicked_pos
 
@@ -90,7 +91,7 @@ def add_colors(color1, color2):
 
 
 
-def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator, texture_manager, race_mode, race_timer, race_timer_button, show_secret_message):
+def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur_square_color, buttons, grid_lines_visible, drawing_mode, error_message, current_algorithm, algorithm_generator, texture_manager, race_mode, race_timer, race_timer_button, show_secret_message, input_blocked):
     # unpack buttons for easier access
     # Găsim butoanele după text, e mai sigur decât despachetarea fixă
     win_triggered = False
@@ -109,12 +110,14 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
     bfs_button = next(b for b in buttons if b.text == "BFS")
     dfs_button = next(b for b in buttons if b.text == "DFS")
     gbfs_button = next(b for b in buttons if b.text == "GBFS")
+    astar_button = next(b for b in buttons if b.text == "A*")
     race_mode_button = next(b for b in buttons if "Race Mode" in b.text)
     
     # reset all to inactive color
     bfs_button.base_color = PURPLE
     dfs_button.base_color = PURPLE
     gbfs_button.base_color = PURPLE
+    astar_button.base_color = PURPLE
     
     if current_algorithm == "bfs":
         bfs_button.base_color = GREEN
@@ -122,7 +125,9 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
         dfs_button.base_color = GREEN
     elif current_algorithm == "gbfs":
         gbfs_button.base_color = GREEN
-    
+    elif current_algorithm == "astar":
+        astar_button.base_color = GREEN
+
     mouse_pos = pygame.mouse.get_pos()
     
     for button in buttons:
@@ -150,7 +155,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
             break
 
         if find_path_button.is_clicked(event) or (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE):
-            if start_node and end_node and algorithm_generator["running"] == False:
+            if start_node and end_node: # and algorithm_generator["running"] == False
                 for row in grid:
                     for spot in row:
                         spot.clear_visualization()
@@ -166,6 +171,8 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                     algorithm_generator["generator"] = dfs(draw_lambda, grid, start_node, end_node, cur_square_color)
                 elif current_algorithm == "gbfs":
                     algorithm_generator["generator"] = greedyBestFirstSearch(draw_lambda, grid, start_node, end_node, cur_square_color)
+                elif current_algorithm == "astar":
+                    algorithm_generator["generator"] = astar(draw_lambda, grid, start_node, end_node, cur_square_color)
                 
                 algorithm_generator["running"] = True
                 algorithm_generator["last_step_time"] = pygame.time.get_ticks()
@@ -188,11 +195,16 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
         
         if race_mode_button.is_clicked(event):
             if race_mode == False:
+                for r in grid:
+                    for s in r:
+                        s.clear_visualization()
+                        algorithm_generator["running"] = False
                 race_mode = True
                 race_mode_button.update_text("Race Mode: ON")
                 race_mode_button.base_color = BUTTON_RED
                 race_mode_button.hovering_color = HOVER_BUTTON_RED
                 race_timer["start_time"] = pygame.time.get_ticks()
+                
             else:
                 race_mode = False
                 race_mode_button.update_text("Race Mode: OFF")
@@ -227,6 +239,10 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
         if gbfs_button.is_clicked(event):
             current_algorithm = "gbfs"
             print("Algorithm set to Greedy Best-First")
+
+        if astar_button.is_clicked(event):
+            current_algorithm = "astar"
+            print("Algorithm set to A*")
         
         grid_changed = False
 
@@ -274,7 +290,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                     gap = GRID_WIDTH // ROWS
                     texture_manager.update_scaled_textures(gap)
                     # Pasăm texture_manager la draw
-                    draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager, race_timer, race_timer_button, show_secret_message)
+                    draw(win, grid, ROWS, width, buttons, grid_lines_visible, error_message, texture_manager, race_mode, race_timer_button, show_secret_message)
                     # --- Sfârșit Modificare ---
                     
                     initial_rows = ROWS 
@@ -292,7 +308,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
 
 
         # handle our drawing and erasing on the map
-        if drawing_mode != "just_loaded" and (pygame.mouse.get_pressed()[0] or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
+        if not input_blocked and drawing_mode != "just_loaded" and (pygame.mouse.get_pressed()[0] or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
             pos = pygame.mouse.get_pos()
             row, col = get_clicked_pos(pos, ROWS, width)
             if row is not None:
@@ -323,7 +339,9 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                                 algorithm_generator["generator"] = dfs(draw_lambda, grid, start_node, end_node, cur_square_color)
                             elif current_algorithm == "gbfs":
                                 algorithm_generator["generator"] = greedyBestFirstSearch(draw_lambda, grid, start_node, end_node, cur_square_color)
-                            
+                            elif current_algorithm == "astar":
+                                algorithm_generator["generator"] = astar(draw_lambda, grid, start_node, end_node, cur_square_color)
+
                             algorithm_generator["running"] = True
                             algorithm_generator["last_step_time"] = pygame.time.get_ticks()
                             cur_square_color = add_colors(cur_square_color, (10, 10, 10))
@@ -356,6 +374,9 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                                             race_mode_button.update_text("Race Mode: OFF")
                                             race_mode_button.base_color = GREEN
                                             race_mode_button.hovering_color = BLUE
+                                            for row in grid:
+                                                for s in row:
+                                                    s.clear_visualization()
                                 else:
                                     spot.mark_barrier()
                                 # -----------------------------
@@ -379,6 +400,9 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
                                             race_mode_button.update_text("Race Mode: OFF")
                                             race_mode_button.base_color = GREEN
                                             race_mode_button.hovering_color = BLUE
+                                            for row in grid:
+                                                for s in row:
+                                                    s.clear_visualization()
                                 else:
                                     spot.mark_barrier()
                     elif drawing_mode == "eraser":
@@ -392,7 +416,7 @@ def handle_events(run, events, grid, ROWS, start_node, end_node, win, width, cur
              drawing_mode = "maker"
 
 
-        if pygame.mouse.get_pressed()[2]:
+        if not input_blocked and pygame.mouse.get_pressed()[2]:
             pos = pygame.mouse.get_pos()
             row, col = get_clicked_pos(pos, ROWS, width)
             if row is not None:

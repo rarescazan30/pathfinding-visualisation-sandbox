@@ -55,19 +55,12 @@ class ImageButton(Button):
         else:
             self.is_selected = False
 
-    # is_clicked este moștenit și funcționează perfect
-
-# --- SFÂRȘIT CLASĂ NOUĂ ---
-
 class RaceTimerButton(Button):
     def __init__(self, x, y, width, height):
-        # We don't need hover colors for the timer, so we use GREY for both
         super().__init__(x, y, width, height, "", None, base_color=GREY, hovering_color=GREY)
         self.text = "Time: 0.0s"
         self.text_color = BLACK
-        # Standard timer font
         self.font = pygame.font.SysFont("Arial", 28, bold=True)
-        # Store x, y, width, height explicitly if needed for custom draw logic
         self.x = x
         self.y = y
         self.width = width
@@ -75,32 +68,22 @@ class RaceTimerButton(Button):
 
     def update_time(self, elapsed_ms: int):
         seconds = elapsed_ms // 1000
-        # Calculate tenths of a second
         tenths = (elapsed_ms % 1000) // 100
         self.text = f"Time: {seconds}.{tenths}s"
 
     def draw(self, win):
-        # Draw background
-        # pygame.draw.rect(win, self.base_color, self.rect, border_radius=6) # Optional background
-        
-        # Render text
         label_surface = self.font.render(self.text, True, self.text_color)
-        # Center the text in the button area
         label_rect = label_surface.get_rect(center=self.rect.center)
         win.blit(label_surface, label_rect)
 
 def create_buttons(button_font, small_font, texture_manager):
-    """
-    Pasăm 'texture_manager' pentru a crea butoanele-imagine.
-    """
     all_buttons = []
     
-    # --- MODIFICARE: Butoanele din Dreapta (Reorganizate) ---
     RIGHT_MENU_START_X = GRID_X_OFFSET + GRID_WIDTH
-    RIGHT_MENU_WIDTH = SIDE_MENU_WIDTH # 280px
+    RIGHT_MENU_WIDTH = SIDE_MENU_WIDTH
     current_y = 20
     
-    # --- Butoane principale (Lățime 200px) ---
+    # --- Standard Buttons ---
     btn_width_large = 200
     btn_x_large = RIGHT_MENU_START_X + (RIGHT_MENU_WIDTH - btn_width_large) // 2
     
@@ -132,7 +115,7 @@ def create_buttons(button_font, small_font, texture_manager):
     all_buttons.append(toggle_mode_button)
     current_y += 70 
     
-    # --- Butoanele +/- și Textul Grilei ---
+    # --- +/- Buttons ---
     current_y += 30 
     
     btn_width_small = 50
@@ -154,31 +137,26 @@ def create_buttons(button_font, small_font, texture_manager):
     all_buttons.append(increase_button)
     current_y += 70 
 
-     # --- MODIFICARE: Butonul Presets ---
-    btn_width_large = 200 # Refolosim lățimea
+     # --- Presets Button ---
+    btn_width_large = 200 
     btn_x_large = RIGHT_MENU_START_X + (RIGHT_MENU_WIDTH - btn_width_large) // 2
     
     presets_button = Button(
         x=btn_x_large, y=current_y, width=btn_width_large, height=50,
         text="Presets", font=button_font,
-        base_color=ORANGE, hovering_color=YELLOW # Culoare distinctă
+        base_color=ORANGE, hovering_color=YELLOW 
     )
-    # Suprascriem culoarea textului să fie neagră pentru contrast pe galben/portocaliu
     presets_button.text_color = BLACK 
     all_buttons.append(presets_button)
     
     current_y += 70
-    # --- SFÂRȘIT MODIFICARE ---
     
-    
-    # --- MODIFICARE: 3 Butoane de I/O ---
-    # Rândul 1: Load (Mac) și Load (Win)
+    # --- Load/Save Buttons ---
     padding = 10
-    btn_width_load = (RIGHT_MENU_WIDTH - (padding * 3)) // 2 # 2 butoane pe rând
+    btn_width_load = (RIGHT_MENU_WIDTH - (padding * 3)) // 2 
     btn_x_load_mac = RIGHT_MENU_START_X + padding
     btn_x_load_win = btn_x_load_mac + btn_width_load + padding
     
-    # Font puțin mai mic pentru a încăpea textul
     load_font = pygame.font.SysFont("Arial", 20, bold=True)
 
     load_mac_button = Button(
@@ -195,9 +173,8 @@ def create_buttons(button_font, small_font, texture_manager):
     )
     all_buttons.append(load_win_button)
     
-    current_y += 60 # Următorul rând
+    current_y += 60 
     
-    # Rândul 2: Save
     save_matrix_button = Button(
         x=btn_x_large, y=current_y, width=btn_width_large, height=50, 
         text="Save", font=button_font, 
@@ -206,13 +183,14 @@ def create_buttons(button_font, small_font, texture_manager):
     all_buttons.append(save_matrix_button)
     current_y += 70 
     
-    # --- Butoane Algoritmi (3 pe rând) ---
-    btn_width_algo = (RIGHT_MENU_WIDTH - (padding * 4)) // 3 
-    algo_font = pygame.font.SysFont("Arial", 18, bold=True) 
+    # --- Algo Buttons (4 per row) ---
+    btn_width_algo = (RIGHT_MENU_WIDTH - (padding * 5)) // 4 
+    algo_font = pygame.font.SysFont("Arial", 16, bold=True) 
     
     btn_x_bfs = RIGHT_MENU_START_X + padding
     btn_x_dfs = btn_x_bfs + btn_width_algo + padding
     btn_x_gbfs = btn_x_dfs + btn_width_algo + padding
+    btn_x_astar = btn_x_gbfs + btn_width_algo + padding
     
     bfs_button = Button(
         x=btn_x_bfs, y=current_y, width=btn_width_algo, height=50,
@@ -234,8 +212,15 @@ def create_buttons(button_font, small_font, texture_manager):
         base_color=PURPLE, hovering_color=GREEN
     )
     all_buttons.append(gbfs_button)
+
+    astar_button = Button(
+        x=btn_x_astar, y=current_y, width=btn_width_algo, height=50,
+        text="A*", font=algo_font, 
+        base_color=PURPLE, hovering_color=GREEN
+    )
+    all_buttons.append(astar_button)
     
-    # --- Butoanele din Stânga (Texturi) ---
+    # --- Texture Buttons (Left Menu) ---
     texture_btn_width = 60
     texture_btn_height = 60 
     h_padding = (SIDE_MENU_WIDTH - (3 * texture_btn_width)) // 4 
@@ -280,7 +265,7 @@ def create_buttons(button_font, small_font, texture_manager):
             except IndexError:
                 print(f"Nu s-a putut crea butonul pentru {category}_{i+1}")
                 
-        current_y_tex += y_gap
+        current_y_tex += y_gap 
 
     timer_x = RIGHT_MENU_START_X + 10
     timer_y = 650
@@ -290,4 +275,3 @@ def create_buttons(button_font, small_font, texture_manager):
     race_timer_button = RaceTimerButton(timer_x, timer_y, timer_width, timer_height)
 
     return all_buttons, race_timer_button
-# --- SFÂRȘIT MODIFICARE ---

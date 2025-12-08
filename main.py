@@ -76,12 +76,12 @@ def main(win, width):
         show_loss_message= False
         # ca sa nu spameze
         if win_start_time > 0:
-            if pygame.time.get_ticks() - win_start_time < 2000:
+            if pygame.time.get_ticks() - win_start_time < 5000:
                 show_win_message = True
             else:
                 win_start_time = 0
         if loss_start_time > 0:
-            if pygame.time.get_ticks() - loss_start_time < 2000:
+            if pygame.time.get_ticks() - loss_start_time < 5000:
                 show_loss_message = True
             else:
                 loss_start_time = 0
@@ -91,11 +91,13 @@ def main(win, width):
 
         events = pygame.event.get()
         
+        input_blocked = show_win_message or show_loss_message # no walls when loss/win is shown
+
         result = handle_events(
             run, events, grid, current_rows, start_node, end_node, win, GRID_WIDTH,
             currrent_square_colour, buttons, grid_lines_visible, drawing_mode,
             error_message, current_algorithm, algorithm_generator,
-            texture_manager, race_mode, race_timer, race_timer_button, show_secret_message
+            texture_manager, race_mode, race_timer, race_timer_button, show_secret_message, input_blocked
         )
         (run, start_node, end_node, currrent_square_colour, 
          grid, grid_lines_visible, drawing_mode, current_rows, 
